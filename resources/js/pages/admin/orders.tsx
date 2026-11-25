@@ -199,14 +199,14 @@ export default function AdminOrders({
         <>
             <Head title="Manajemen Pesanan" />
 
-            <div className="space-y-6 p-6">
+            <div className="space-y-6 p-6 sm:p-8">
                 {/* Header */}
-                <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                <div className="flex flex-col justify-between gap-2 border-b border-[#A88B54]/20 pb-5 sm:flex-row sm:items-center">
                     <div>
-                        <h1 className="text-xl font-bold text-gray-900">
+                        <h1 className="font-serif text-2xl font-normal text-[#16233B] sm:text-3xl">
                             Manajemen Pesanan &amp; Tracking
                         </h1>
-                        <p className="text-xs text-gray-500">
+                        <p className="mt-0.5 font-sans text-xs text-[#6E675D] sm:text-sm">
                             Kelola verifikasi pembayaran, pengemasan, nomor
                             resi, hingga pesanan tiba.
                         </p>
@@ -215,21 +215,23 @@ export default function AdminOrders({
 
                 {/* Summary Stat Cards */}
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-                    <div className="rounded-2xl bg-[#16233B] px-4 py-3.5 text-[#F2EBDC] shadow-sm">
-                        <p className="text-xs opacity-80">Total Pesanan</p>
-                        <p className="mt-1 text-2xl font-bold">
+                    <div className="rounded-2xl border border-[#A88B54]/40 bg-[#16233B] px-4 py-3.5 text-[#F2EBDC] shadow-xs">
+                        <p className="font-sans text-xs font-semibold tracking-wide text-[#F2EBDC]/80 uppercase">
+                            Total Pesanan
+                        </p>
+                        <p className="mt-1 font-serif text-2xl font-semibold">
                             {orders.length}
                         </p>
                     </div>
                     {ORDER_STAGES.map((stage) => (
                         <div
                             key={stage.key}
-                            className="rounded-2xl border border-gray-200 bg-white px-4 py-3.5 shadow-xs"
+                            className="rounded-2xl border border-[#A88B54]/25 bg-white px-4 py-3.5 shadow-xs"
                         >
-                            <p className="text-xs text-gray-500">
+                            <p className="font-sans text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                 {stage.label}
                             </p>
-                            <p className="mt-1 text-2xl font-bold text-gray-900">
+                            <p className="mt-1 font-serif text-2xl font-semibold text-[#16233B]">
                                 {
                                     orders.filter((o) => o.status === stage.key)
                                         .length
@@ -241,13 +243,13 @@ export default function AdminOrders({
 
                 {/* Toolbar */}
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex max-w-sm flex-1 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 shadow-xs">
-                        <SearchIcon className="size-4 shrink-0 text-gray-400" />
+                    <div className="flex max-w-sm flex-1 items-center gap-2 rounded-xl border border-[#A88B54]/30 bg-white px-3.5 py-2 shadow-xs">
+                        <SearchIcon className="size-4 shrink-0 text-[#A88B54]" />
                         <input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Cari no. invoice, nama, perusahaan, resi..."
-                            className="flex-1 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
+                            className="flex-1 bg-transparent font-sans text-sm text-[#16233B] outline-none placeholder:text-[#6E675D]/70"
                         />
                     </div>
 
@@ -256,10 +258,10 @@ export default function AdminOrders({
                             type="button"
                             onClick={() => setStatusFilter('all')}
                             className={cn(
-                                'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors',
+                                'rounded-full px-3.5 py-1.5 font-sans text-xs font-semibold transition-colors',
                                 statusFilter === 'all'
                                     ? 'bg-[#16233B] text-[#F2EBDC]'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                                    : 'border border-[#A88B54]/30 bg-white text-[#16233B] hover:bg-[#F2EBDC]',
                             )}
                         >
                             Semua
@@ -270,10 +272,10 @@ export default function AdminOrders({
                                 type="button"
                                 onClick={() => setStatusFilter(stage.key)}
                                 className={cn(
-                                    'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors',
+                                    'rounded-full px-3.5 py-1.5 font-sans text-xs font-semibold transition-colors',
                                     statusFilter === stage.key
                                         ? 'bg-[#16233B] text-[#F2EBDC]'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                                        : 'border border-[#A88B54]/30 bg-white text-[#16233B] hover:bg-[#F2EBDC]',
                                 )}
                             >
                                 {stage.label}
@@ -283,40 +285,40 @@ export default function AdminOrders({
                 </div>
 
                 {/* Orders Table */}
-                <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+                <div className="overflow-hidden rounded-2xl border border-[#A88B54]/25 bg-white shadow-xs">
                     <div className="overflow-x-auto">
                         <table className="min-w-full text-sm">
                             <thead>
-                                <tr className="border-b border-gray-100 bg-gray-50/70">
-                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                <tr className="border-b border-[#A88B54]/20 bg-[#F2EBDC]/60">
+                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Invoice
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Pelanggan
                                     </th>
-                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Item
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Total
                                     </th>
-                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Tahap
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Resi
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Aksi
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-[#A88B54]/15">
                                 {filteredOrders.length === 0 ? (
                                     <tr>
                                         <td
                                             colSpan={7}
-                                            className="py-12 text-center text-sm text-gray-400"
+                                            className="py-12 text-center font-sans text-sm text-[#6E675D]"
                                         >
                                             Belum ada pesanan yang sesuai.
                                         </td>
@@ -329,7 +331,7 @@ export default function AdminOrders({
                                         return (
                                             <tr
                                                 key={order.id}
-                                                className="transition-colors hover:bg-gray-50/60"
+                                                className="transition-colors hover:bg-[#FAF7F0]"
                                             >
                                                 <td className="px-4 py-3.5">
                                                     <p className="font-mono text-xs font-semibold text-gray-900">

@@ -11,20 +11,23 @@ import { useEffect, useState } from 'react';
 import AccountController from '@/actions/App/Http/Controllers/AccountController';
 import B2BCustomizerController from '@/actions/App/Http/Controllers/B2BCustomizerController';
 import CartController from '@/actions/App/Http/Controllers/CartController';
-import { login } from '@/routes';
+import { home, login } from '@/routes';
 import type { SharedPageProps } from '@/types';
 
 const NAV_LINKS = [
     { href: '#tentang', label: 'Tentang' },
-    { href: '#koleksi', label: 'Koleksi' },
+    { href: '#koleksi', label: 'Katalog' },
     { href: '#cara-pesan', label: 'Cara Pesan' },
     { href: '#corporate', label: 'Corporate' },
     { href: '#faq', label: 'FAQ' },
 ];
 
 export default function Navbar() {
-    const { auth, cartCount } = usePage<SharedPageProps>().props;
+    const { url, props } = usePage<SharedPageProps>();
+    const { auth, cartCount } = props;
     const user = auth?.user ?? null;
+    const isHomePage =
+        url === '/' || url.startsWith('/?') || url.startsWith('/#');
 
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -39,56 +42,76 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    const resolveNavHref = (href: string): string => {
+        if (!isHomePage && href.startsWith('#')) {
+            return `/${href}`;
+        }
+        return href;
+    };
+
     const handleNavClick = (
         e: React.MouseEvent<HTMLAnchorElement>,
         href: string,
     ) => {
-        if (href.startsWith('#')) {
+        if (isHomePage && href.startsWith('#')) {
             e.preventDefault();
             const target = document.querySelector(href);
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth' });
             }
-            setMobileOpen(false);
         }
+        setMobileOpen(false);
     };
 
     const cartHref = user ? CartController.index().url : login().url;
     const accountHref = user ? AccountController.index().url : login().url;
+
+    const logoImage = (
+        <img
+            src="/asset/logo/Logo_galu&co.png"
+            alt="Galuh & Co."
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+            className="pointer-events-none max-h-10 max-w-full object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)] sm:max-h-11"
+        />
+    );
 
     return (
         <header className="pointer-events-none fixed inset-x-0 top-4 z-50 px-4 sm:px-6">
             {/* ── Main Floating Pill Glass Container ────────────────────────────── */}
             <nav
                 aria-label="Navigasi Utama"
-                className={`pointer-events-auto mx-auto flex h-[64px] max-w-6xl items-center justify-between rounded-full px-5 transition-all duration-300 sm:px-7 ${
-                    isScrolled
+                className={`pointer-events-auto mx-auto flex h-[64px] max-w-6xl items-center justify-between rounded-full px-5 transition-all duration-300 sm:px-7 ${isScrolled
                         ? 'border border-[#A88B54]/40 bg-[#16233B]/95 shadow-[0_8px_30px_rgba(22,35,59,0.25)] backdrop-blur-xl'
                         : 'border border-[#A88B54]/35 bg-[#16233B]/65 shadow-[0_8px_32px_rgba(0,0,0,0.28)] backdrop-blur-xl'
-                }`}
+                    }`}
             >
                 {/* 1. Kiri: Logo GALUH & CO. */}
-                <a
-                    href="#"
-                    aria-label="Galuh & Co. Beranda"
-                    className="relative flex h-11 w-20 shrink-0 items-center justify-center sm:h-12 sm:w-24"
-                >
-                    <img
-                        src="/asset/logo/Logo_galu&co.png"
-                        alt="Galuh & Co."
-                        loading="eager"
-                        decoding="async"
-                        fetchPriority="high"
-                        className="pointer-events-none max-h-10 max-w-full object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)] sm:max-h-11"
-                    />
-                </a>
+                {isHomePage ? (
+                    <a
+                        href="#"
+                        aria-label="Galuh & Co. Beranda"
+                        className="relative flex h-11 w-20 shrink-0 items-center justify-center sm:h-12 sm:w-24"
+                    >
+                        {logoImage}
+                    </a>
+                ) : (
+                    <Link
+                        href={home()}
+                        aria-label="Galuh & Co. Beranda"
+                        className="relative flex h-11 w-20 shrink-0 items-center justify-center sm:h-12 sm:w-24"
+                    >
+                        {logoImage}
+                    </Link>
+                )}
 
                 {/* 2. Tengah (Desktop): Link Smooth-scroll + 3D Customizer */}
                 <div className="hidden items-center gap-5 lg:flex lg:gap-7">
                     {NAV_LINKS.map((link) => (
                         <a
                             key={link.href}
-                            href={link.href}
+                            href={resolveNavHref(link.href)}
                             onClick={(e) => handleNavClick(e, link.href)}
                             className="group relative py-1 font-sans text-xs font-medium tracking-wider text-[#F2EBDC]/90 uppercase transition-colors duration-200 hover:text-[#F2EBDC]"
                         >
@@ -123,11 +146,10 @@ export default function Navbar() {
 
                     <Link
                         href={accountHref}
-                        className={`hidden items-center gap-1.5 rounded-full px-4 py-2 font-sans text-xs font-semibold tracking-wide transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:inline-flex ${
-                            isScrolled
+                        className={`hidden items-center gap-1.5 rounded-full px-4 py-2 font-sans text-xs font-semibold tracking-wide transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:inline-flex ${isScrolled
                                 ? 'bg-[#F2EBDC] text-[#16233B] hover:bg-white'
                                 : 'bg-[#A88B54] text-[#16233B] hover:bg-[#B89B64]'
-                        }`}
+                            }`}
                     >
                         <UserIcon className="size-3.5" />
                         <span>{user ? 'Akun Saya' : 'Masuk'}</span>
@@ -177,7 +199,7 @@ export default function Navbar() {
                                 {NAV_LINKS.map((link) => (
                                     <a
                                         key={link.href}
-                                        href={link.href}
+                                        href={resolveNavHref(link.href)}
                                         onClick={(e) =>
                                             handleNavClick(e, link.href)
                                         }

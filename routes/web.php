@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\PartnerController as AdminPartnerController;
 // Import controller untuk mengelola CRUD produk hampers di halaman admin
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 // Import controller untuk 3D Customizer & pemutar video ucapan B2B
+use App\Http\Controllers\Auth\GoogleAuthController;
+// Import controller untuk autentikasi Google OAuth khusus pelanggan
 use App\Http\Controllers\B2BCustomizerController;
 // Import controller untuk keranjang belanja user
 use App\Http\Controllers\CartController;
@@ -98,8 +100,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 });
 
-// Portal Login Khusus Administrator
+// Portal Login Khusus Administrator & Autentikasi Google OAuth Customer
 Route::middleware('guest')->group(function () {
+    Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('auth.google.redirect');
+    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
+
     Route::get('/admin/login', [AdminAuthController::class, 'create'])->name('admin.login');
     Route::post('/admin/login', [AdminAuthController::class, 'store'])
         ->middleware('throttle:6,1')

@@ -28,33 +28,33 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
             <div className="flex flex-col lg:flex-row lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">
                     <nav
-                        className="flex flex-col space-y-0.5"
+                        className="flex flex-col space-y-1"
                         aria-label="Settings"
                     >
-                        {sidebarNavItems.map((item, index) => (
-                            <Link
-                                key={`${toUrl(item.href)}-${index}`}
-                                href={item.href}
-                                className={cn(
-                                    'flex w-full items-center justify-start gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                                    isCurrentOrParentUrl(item.href)
-                                        ? 'text-white'
-                                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
-                                )}
-                                style={
-                                    isCurrentOrParentUrl(item.href)
-                                        ? { background: '#2d5a3d' }
-                                        : undefined
-                                }
-                            >
-                                {item.icon && <item.icon className="h-4 w-4" />}
-                                {item.title}
-                            </Link>
-                        ))}
+                        {sidebarNavItems.map((item, index) => {
+                            const isActive = isCurrentOrParentUrl(item.href);
+                            return (
+                                <Link
+                                    key={`${toUrl(item.href)}-${index}`}
+                                    href={item.href}
+                                    className={cn(
+                                        'flex w-full items-center justify-start gap-2 rounded-xl px-3.5 py-2 font-sans text-sm font-medium transition-colors',
+                                        isActive
+                                            ? 'bg-[#16233B] text-[#F2EBDC] shadow-xs'
+                                            : 'text-[#6E675D] hover:bg-[#F2EBDC] hover:text-[#16233B]',
+                                    )}
+                                >
+                                    {item.icon && (
+                                        <item.icon className="h-4 w-4" />
+                                    )}
+                                    {item.title}
+                                </Link>
+                            );
+                        })}
                     </nav>
                 </aside>
 
-                <Separator className="my-6 lg:hidden" />
+                <Separator className="my-6 bg-[#A88B54]/20 lg:hidden" />
 
                 <div className="flex-1 md:max-w-2xl">
                     <section className="max-w-xl space-y-12">

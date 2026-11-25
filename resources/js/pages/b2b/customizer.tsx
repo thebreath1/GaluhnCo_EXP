@@ -19,15 +19,16 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import B2BCustomizerController from '@/actions/App/Http/Controllers/B2BCustomizerController';
 import CartController from '@/actions/App/Http/Controllers/CartController';
+import type {
+    ParcelCatalogItem,
+    ParcelItemId,
+} from '@/components/b2b/parcel-catalog';
 import {
     BASE_BOX_PRICE,
     MAX_PARCEL_SLOTS,
     PARCEL_ITEMS,
     QUICK_PRESETS,
-    type ParcelCatalogItem,
-    type ParcelItemId,
 } from '@/components/b2b/parcel-catalog';
-import FooterSection from '@/components/landing/FooterSection';
 import { Spinner } from '@/components/ui/spinner';
 import { home, login, register } from '@/routes';
 import type { SharedPageProps } from '@/types';
@@ -261,42 +262,54 @@ export default function GiftBoxCustomizer({
             <Head title="3D Luxury Gift Box Customizer — Galuh & Co." />
 
             <div className="min-h-screen bg-[#F2EBDC] font-sans text-[#16233B] antialiased selection:bg-[#A88B54]/25 selection:text-[#16233B]">
-                {/* Sticky Header */}
-                <header className="sticky top-0 z-40 border-b border-[#A88B54]/30 bg-[#16233B]/95 backdrop-blur-md">
-                    <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-6">
+                {/* Minimal Floating Studio Header */}
+                <header className="sticky top-3 z-40 px-4 sm:px-6">
+                    <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 rounded-full border border-[#A88B54]/40 bg-[#16233B]/95 px-4 shadow-[0_8px_28px_rgba(22,35,59,0.28)] backdrop-blur-xl sm:px-6">
                         <Link
                             href={home()}
-                            className="inline-flex items-center gap-2 font-sans text-xs font-semibold tracking-wider text-[#F2EBDC] uppercase transition-colors hover:text-[#A88B54]"
+                            className="inline-flex items-center gap-1.5 font-sans text-xs font-semibold tracking-wider text-[#F2EBDC] uppercase transition-colors hover:text-[#A88B54]"
                         >
                             <ArrowLeftIcon className="size-4" />
-                            <span>Beranda</span>
+                            <span>Kembali</span>
                         </Link>
 
-                        <Link href={home()} className="flex items-center">
+                        <Link
+                            href={home()}
+                            aria-label="Galuh & Co. — 3D Studio"
+                            className="flex items-center gap-2.5 transition-opacity hover:opacity-90"
+                        >
                             <img
                                 src="/asset/logo/Logo_galu&co.png"
                                 alt="Galuh & Co."
-                                className="h-8 w-auto object-contain sm:h-9"
+                                className="h-6 w-auto object-contain sm:h-7"
                             />
+                            <span
+                                aria-hidden="true"
+                                className="hidden h-4 w-px bg-[#A88B54]/45 sm:inline-block"
+                            />
+                            <span className="hidden font-sans text-[11px] font-semibold tracking-[0.22em] text-[#A88B54] uppercase sm:inline">
+                                3D STUDIO
+                            </span>
                         </Link>
 
                         <Link
                             href={isLoggedIn ? CartController.index() : login()}
-                            className="inline-flex items-center gap-1.5 rounded-full bg-[#F2EBDC] px-4 py-2 font-sans text-xs font-semibold text-[#16233B] transition-colors hover:bg-white"
+                            aria-label="Keranjang Belanja"
+                            className="relative inline-flex items-center gap-1.5 rounded-full bg-[#F2EBDC] px-3.5 py-1.5 font-sans text-xs font-semibold text-[#16233B] transition-colors hover:bg-white"
                         >
                             <ShoppingBagIcon className="size-3.5" />
-                            <span>Keranjang</span>
+                            <span className="hidden sm:inline">Keranjang</span>
                             {cartCount > 0 && (
                                 <span className="inline-flex min-w-[18px] items-center justify-center rounded-full bg-[#16233B] px-1 text-[10px] font-bold text-[#F2EBDC]">
-                                    {cartCount}
+                                    {cartCount > 99 ? '99+' : cartCount}
                                 </span>
                             )}
                         </Link>
                     </div>
                 </header>
 
-                <main className="mx-auto max-w-7xl px-6 py-10 md:py-14">
-                    <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+                <main className="mx-auto max-w-7xl px-6 py-6 md:py-8">
+                    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
                         <div>
                             <div className="inline-flex items-center gap-2 rounded-full border border-[#A88B54]/40 bg-[#16233B] px-3.5 py-1 text-[11px] font-semibold tracking-wider text-[#F2EBDC] uppercase">
                                 {isB2B ? (
@@ -321,7 +334,7 @@ export default function GiftBoxCustomizer({
 
                     <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
                         {/* Kiri: Interactive 3D Viewport (Lazy Loaded) */}
-                        <div className="lg:sticky lg:top-24 lg:col-span-7">
+                        <div className="lg:sticky lg:top-20 lg:col-span-7">
                             <div className="relative overflow-hidden rounded-3xl border border-[#A88B54]/40 bg-[#16233B] shadow-[0_24px_60px_-15px_rgba(22,35,59,0.45)]">
                                 {/* Studio Header Bar */}
                                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#A88B54]/25 px-5 py-3.5 text-xs text-[#F2EBDC]">
@@ -909,8 +922,6 @@ export default function GiftBoxCustomizer({
                         </form>
                     </div>
                 </main>
-
-                <FooterSection />
             </div>
         </>
     );

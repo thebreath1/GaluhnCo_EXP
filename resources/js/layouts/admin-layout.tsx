@@ -1,11 +1,11 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import {
-    BarChart3Icon,
     BellIcon,
     BuildingIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
     ClipboardListIcon,
+    ExternalLinkIcon,
     LayoutGridIcon,
     LayoutTemplateIcon,
     LogOutIcon,
@@ -22,8 +22,7 @@ import * as AdminPartnerController from '@/actions/App/Http/Controllers/Admin/Pa
 import * as AdminProductController from '@/actions/App/Http/Controllers/Admin/ProductController';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
-import { logout } from '@/routes';
-import { dashboard } from '@/routes';
+import { dashboard, home, logout } from '@/routes';
 import type { Auth } from '@/types';
 import { cn } from '@/utils';
 
@@ -61,7 +60,6 @@ const navItems = [
     { href: '/settings/profile', icon: SettingsIcon, label: 'Pengaturan' },
 ];
 
-// Dark green: #1a3a2a  Active: #2d5a3d  Cream content bg: #f5f0e8
 export default function AdminLayout({ children }: Props) {
     const { auth } = usePage<{ auth: Auth }>().props;
     const { isCurrentOrParentUrl } = useCurrentUrl();
@@ -73,17 +71,13 @@ export default function AdminLayout({ children }: Props) {
     };
 
     return (
-        <div
-            className="flex h-screen overflow-hidden"
-            style={{ background: '#f5f0e8' }}
-        >
-            {/* ── Sidebar ───────────────────────────────────────────── */}
+        <div className="flex h-screen overflow-hidden bg-[#F2EBDC] font-sans text-[#16233B] antialiased selection:bg-[#A88B54]/25 selection:text-[#16233B]">
+            {/* ── Sidebar Deep Navy ──────────────────────────────────────────── */}
             <aside
                 className={cn(
-                    'relative flex flex-shrink-0 flex-col py-5 transition-all duration-300 ease-in-out',
-                    collapsed ? 'w-16 items-center' : 'w-56',
+                    'relative flex flex-shrink-0 flex-col border-r border-[#A88B54]/25 bg-[#16233B] py-5 text-[#F2EBDC] transition-all duration-300 ease-in-out',
+                    collapsed ? 'w-16 items-center' : 'w-60',
                 )}
-                style={{ background: '#1a3a2a' }}
             >
                 {/* Logo row */}
                 <div
@@ -92,21 +86,29 @@ export default function AdminLayout({ children }: Props) {
                         collapsed && 'justify-center px-0',
                     )}
                 >
-                    <div
-                        className="flex size-9 shrink-0 items-center justify-center rounded-xl text-white"
-                        style={{ background: '#2d5a3d' }}
-                    >
-                        <BarChart3Icon className="size-5" />
-                    </div>
-                    {!collapsed && (
-                        <span className="truncate text-sm font-bold tracking-wide text-white/90">
-                            Galuh Co.
-                        </span>
+                    {collapsed ? (
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-[#A88B54]/50 bg-[#1E2F4D] font-serif text-lg font-semibold text-[#F2EBDC] shadow-xs">
+                            G
+                        </div>
+                    ) : (
+                        <Link
+                            href={dashboard()}
+                            className="flex flex-col gap-1 transition-opacity hover:opacity-90"
+                        >
+                            <img
+                                src="/asset/logo/Logo_galu&co.png"
+                                alt="Galuh & Co."
+                                className="h-8 w-auto object-contain"
+                            />
+                            <span className="font-sans text-[10px] font-semibold tracking-[0.22em] text-[#A88B54] uppercase">
+                                Admin Studio
+                            </span>
+                        </Link>
                     )}
                 </div>
 
                 {/* Nav */}
-                <nav className="flex flex-1 flex-col gap-0.5 px-2">
+                <nav className="flex flex-1 flex-col gap-1 px-2.5">
                     {navItems.map((item) => {
                         const isActive = isCurrentOrParentUrl(item.href);
                         return (
@@ -115,19 +117,21 @@ export default function AdminLayout({ children }: Props) {
                                 href={item.href}
                                 title={collapsed ? item.label : undefined}
                                 className={cn(
-                                    'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
+                                    'flex items-center gap-3 rounded-xl px-3 py-2.5 font-sans text-sm font-medium transition-all',
                                     collapsed && 'justify-center px-0',
                                     isActive
-                                        ? 'text-white shadow-md'
-                                        : 'text-white/60 hover:bg-white/10 hover:text-white/90',
+                                        ? 'border border-[#A88B54]/45 bg-[#1E2F4D] text-[#F2EBDC] shadow-sm'
+                                        : 'border border-transparent text-[#F2EBDC]/70 hover:bg-[#1E2F4D]/60 hover:text-[#F2EBDC]',
                                 )}
-                                style={
-                                    isActive
-                                        ? { background: '#2d5a3d' }
-                                        : undefined
-                                }
                             >
-                                <item.icon className="size-4.5 shrink-0" />
+                                <item.icon
+                                    className={cn(
+                                        'size-4.5 shrink-0',
+                                        isActive
+                                            ? 'text-[#A88B54]'
+                                            : 'text-[#F2EBDC]/65',
+                                    )}
+                                />
                                 {!collapsed && <span>{item.label}</span>}
                             </Link>
                         );
@@ -135,18 +139,18 @@ export default function AdminLayout({ children }: Props) {
                 </nav>
 
                 {/* User + logout */}
-                <div className="mt-auto space-y-1 px-2">
+                <div className="mt-auto space-y-1.5 px-2.5">
                     {!collapsed && auth.user && (
-                        <div className="flex items-center gap-2 rounded-xl px-3 py-2.5">
-                            <div
-                                className="flex size-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white"
-                                style={{ background: '#2d5a3d' }}
-                            >
+                        <div className="flex items-center gap-2.5 rounded-xl border border-[#A88B54]/20 bg-[#1E2F4D]/75 px-3 py-2.5">
+                            <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#A88B54] font-sans text-xs font-bold text-[#16233B]">
                                 {getInitials(auth.user.name)}
                             </div>
                             <div className="min-w-0">
-                                <p className="truncate text-xs font-medium text-white/90">
+                                <p className="truncate font-sans text-xs font-semibold text-[#F2EBDC]">
                                     {auth.user.name}
+                                </p>
+                                <p className="truncate font-sans text-[10px] text-[#A88B54]">
+                                    Administrator
                                 </p>
                             </div>
                         </div>
@@ -156,12 +160,12 @@ export default function AdminLayout({ children }: Props) {
                         onClick={handleLogout}
                         title="Logout"
                         className={cn(
-                            'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/60 transition-all hover:bg-white/10 hover:text-white/90',
+                            'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 font-sans text-sm font-medium text-[#F2EBDC]/70 transition-all hover:bg-[#1E2F4D]/70 hover:text-[#F2EBDC]',
                             collapsed && 'justify-center px-0',
                         )}
                     >
-                        <LogOutIcon className="size-4.5 shrink-0" />
-                        {!collapsed && <span>Logout</span>}
+                        <LogOutIcon className="size-4.5 shrink-0 text-[#A88B54]" />
+                        {!collapsed && <span>Keluar</span>}
                     </button>
                 </div>
 
@@ -169,8 +173,7 @@ export default function AdminLayout({ children }: Props) {
                 <button
                     type="button"
                     onClick={() => setCollapsed((v) => !v)}
-                    className="absolute top-20 -right-3 flex size-6 items-center justify-center rounded-full border border-white/20 text-white/80 shadow-md transition-colors hover:text-white"
-                    style={{ background: '#2d5a3d' }}
+                    className="absolute top-20 -right-3 flex size-6 items-center justify-center rounded-full border border-[#A88B54]/50 bg-[#1E2F4D] text-[#A88B54] shadow-md transition-colors hover:bg-[#16233B] hover:text-[#F2EBDC]"
                     aria-label={
                         collapsed ? 'Expand sidebar' : 'Collapse sidebar'
                     }
@@ -186,29 +189,32 @@ export default function AdminLayout({ children }: Props) {
             {/* ── Main area ─────────────────────────────────────────── */}
             <div className="flex flex-1 flex-col overflow-hidden">
                 {/* Header */}
-                <header
-                    className="flex h-14 flex-shrink-0 items-center gap-3 px-4 shadow-sm"
-                    style={{
-                        background: '#f5f0e8',
-                        borderBottom: '1px solid #e0d9cc',
-                    }}
-                >
+                <header className="flex h-14 flex-shrink-0 items-center gap-3 border-b border-[#A88B54]/25 bg-[#F2EBDC]/95 px-5 backdrop-blur-md">
                     {/* Mobile / extra toggle */}
                     <button
                         type="button"
                         onClick={() => setCollapsed((v) => !v)}
-                        className="flex size-9 items-center justify-center rounded-xl transition-colors hover:bg-black/5 md:hidden"
+                        aria-label="Toggle sidebar"
+                        className="flex size-9 items-center justify-center rounded-xl text-[#16233B] transition-colors hover:bg-[#16233B]/5 md:hidden"
                     >
-                        <MenuIcon className="size-5 text-gray-600" />
+                        <MenuIcon className="size-5" />
                     </button>
 
-                    {/* Page breadcrumb area — left side */}
-                    <div className="flex-1" />
+                    {/* Left shortcut */}
+                    <div className="flex flex-1 items-center">
+                        <Link
+                            href={home()}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-[#A88B54]/35 bg-[#FAF7F0] px-3.5 py-1.5 font-sans text-xs font-semibold text-[#16233B] transition-colors hover:border-[#A88B54] hover:bg-white"
+                        >
+                            <span>Lihat Website</span>
+                            <ExternalLinkIcon className="size-3 text-[#A88B54]" />
+                        </Link>
+                    </div>
 
                     {/* Right controls */}
                     <div className="flex items-center gap-2">
                         {/* Date */}
-                        <span className="hidden text-xs font-medium text-gray-500 md:block">
+                        <span className="hidden font-sans text-xs font-medium text-[#6E675D] md:block">
                             {new Date().toLocaleDateString('id-ID', {
                                 weekday: 'short',
                                 day: 'numeric',
@@ -220,38 +226,31 @@ export default function AdminLayout({ children }: Props) {
                         {/* Bell */}
                         <button
                             type="button"
-                            className="flex size-9 items-center justify-center rounded-xl transition-colors hover:bg-black/5"
+                            aria-label="Notifikasi"
+                            className="flex size-9 items-center justify-center rounded-xl text-[#6E675D] transition-colors hover:bg-[#16233B]/5 hover:text-[#16233B]"
                         >
-                            <BellIcon className="size-4.5 text-gray-500" />
+                            <BellIcon className="size-4.5" />
                         </button>
 
                         {/* Settings */}
                         <Link
                             href="/settings/profile"
-                            className="flex size-9 items-center justify-center rounded-xl transition-colors hover:bg-black/5"
+                            aria-label="Pengaturan Akun"
+                            className="flex size-9 items-center justify-center rounded-xl text-[#6E675D] transition-colors hover:bg-[#16233B]/5 hover:text-[#16233B]"
                         >
-                            <SettingsIcon className="size-4.5 text-gray-500" />
+                            <SettingsIcon className="size-4.5" />
                         </Link>
 
                         {/* Avatar */}
-                        <div
-                            className="flex size-9 items-center justify-center rounded-xl text-xs font-bold text-white shadow-sm"
-                            style={{ background: '#2d5a3d' }}
-                        >
+                        <div className="flex size-9 items-center justify-center rounded-xl border border-[#A88B54]/45 bg-[#16233B] font-sans text-xs font-bold text-[#F2EBDC] shadow-xs">
                             {auth.user ? getInitials(auth.user.name) : '?'}
                         </div>
                     </div>
                 </header>
 
                 {/* Page content */}
-                <main className="flex-1 overflow-y-auto p-4">
-                    <div
-                        className="min-h-full overflow-hidden rounded-2xl shadow-sm"
-                        style={{
-                            background: '#ffffff',
-                            border: '1px solid #e0d9cc',
-                        }}
-                    >
+                <main className="flex-1 overflow-y-auto p-4 sm:p-5">
+                    <div className="min-h-full overflow-hidden rounded-3xl border border-[#A88B54]/25 bg-[#FAF7F0] shadow-[0_14px_38px_-14px_rgba(22,35,59,0.10)]">
                         {children}
                     </div>
                 </main>

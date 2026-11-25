@@ -1,9 +1,9 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, SparklesIcon } from 'lucide-react';
 import * as AdminInquiryController from '@/actions/App/Http/Controllers/Admin/InquiryController';
 import * as AdminProductController from '@/actions/App/Http/Controllers/Admin/ProductController';
-import type { Auth } from '@/types';
 import { Badge } from '@/components/ui/badge';
+import type { Auth } from '@/types';
 import { cn } from '@/utils';
 
 type Stats = {
@@ -42,22 +42,27 @@ export default function Dashboard({ stats, recent_inquiries }: PageProps) {
 
     return (
         <>
-            <Head title="Dashboard" />
+            <Head title="Dashboard — Admin Studio" />
 
-            <div className="space-y-6 p-6">
+            <div className="space-y-6 p-6 sm:p-8">
                 {/* Greeting */}
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col justify-between gap-4 border-b border-[#A88B54]/20 pb-5 sm:flex-row sm:items-end">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">
-                            Halo, {firstName}!
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#16233B] px-3 py-1 font-sans text-[11px] font-semibold tracking-wider text-[#F2EBDC] uppercase">
+                            <SparklesIcon className="size-3 text-[#A88B54]" />
+                            Portal Manajemen
+                        </span>
+                        <h1 className="mt-2.5 font-serif text-3xl font-normal tracking-normal text-[#16233B]">
+                            Halo, {firstName}
                         </h1>
-                        <p className="mt-0.5 text-sm text-gray-500">
-                            Ini ringkasan aktivitas admin bulan ini.
+                        <p className="mt-0.5 font-sans text-sm text-[#6E675D]">
+                            Ringkasan performa katalog dan inquiry korporat
+                            Galuh &amp; Co.
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm">
-                            Bulan ini
+                        <span className="rounded-full border border-[#A88B54]/30 bg-white px-4 py-1.5 font-sans text-xs font-semibold text-[#16233B] shadow-xs">
+                            Bulan Ini
                         </span>
                     </div>
                 </div>
@@ -67,46 +72,31 @@ export default function Dashboard({ stats, recent_inquiries }: PageProps) {
                     <StatCard
                         label="Total Produk"
                         value={stats.total_products}
-                        gradient="from-emerald-800 to-green-700"
-                        textColor="text-white"
+                        variant="navy"
                         href={AdminProductController.index().url}
                     />
                     <StatCard
                         label="Produk Aktif"
                         value={stats.active_products}
-                        gradient="from-white to-white"
-                        textColor="text-gray-900"
-                        border
+                        variant="ivory"
                         href={AdminProductController.index().url}
                     />
                     <StatCard
                         label="Total Inquiry"
                         value={stats.total_inquiries}
-                        gradient="from-white to-white"
-                        textColor="text-gray-900"
-                        border
+                        variant="ivory"
                         href={AdminInquiryController.index().url}
                     />
                     <StatCard
                         label="Inquiry Baru"
                         value={stats.new_inquiries}
-                        gradient={
-                            stats.new_inquiries > 0
-                                ? 'from-amber-500 to-orange-500'
-                                : 'from-white to-white'
-                        }
-                        textColor={
-                            stats.new_inquiries > 0
-                                ? 'text-white'
-                                : 'text-gray-900'
-                        }
-                        border={stats.new_inquiries === 0}
+                        variant={stats.new_inquiries > 0 ? 'softNavy' : 'ivory'}
                         href={AdminInquiryController.index().url}
                     />
                 </div>
 
                 {/* Bottom section: quick actions + recent table */}
-                <div className="grid gap-4 lg:grid-cols-3">
+                <div className="grid gap-5 lg:grid-cols-3">
                     {/* Quick actions */}
                     <div className="grid grid-cols-2 gap-4">
                         <QuickActionCard
@@ -125,50 +115,44 @@ export default function Dashboard({ stats, recent_inquiries }: PageProps) {
                     </div>
 
                     {/* Recent inquiries */}
-                    <div className="col-span-2 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-                        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-                            <p className="text-sm font-semibold text-gray-900">
+                    <div className="overflow-hidden rounded-2xl border border-[#A88B54]/25 bg-white shadow-[0_12px_28px_-14px_rgba(22,35,59,0.10)] lg:col-span-2">
+                        <div className="flex items-center justify-between border-b border-[#A88B54]/20 px-5 py-4">
+                            <p className="font-serif text-lg font-semibold text-[#16233B]">
                                 Inquiry Terbaru
                             </p>
                             <Link
                                 href={AdminInquiryController.index().url}
-                                className="text-xs font-medium text-emerald-700 hover:text-emerald-800"
+                                className="font-sans text-xs font-semibold text-[#16233B] underline decoration-[#A88B54] underline-offset-4 transition-colors hover:text-[#1F304F]"
                             >
                                 Lihat semua →
                             </Link>
                         </div>
-                        <div className="divide-y divide-gray-50">
+                        <div className="divide-y divide-[#A88B54]/15">
                             {recent_inquiries.length === 0 ? (
-                                <p className="py-8 text-center text-sm text-gray-400">
+                                <p className="py-10 text-center font-sans text-sm text-[#6E675D]">
                                     Belum ada inquiry masuk.
                                 </p>
                             ) : (
                                 recent_inquiries.map((inq) => (
                                     <div
                                         key={inq.id}
-                                        className="flex items-center gap-3 px-5 py-3"
+                                        className="flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-[#FAF7F0]"
                                     >
-                                        <div
-                                            className="flex size-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold"
-                                            style={{
-                                                background: '#e8f0eb',
-                                                color: '#2d5a3d',
-                                            }}
-                                        >
+                                        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#16233B] font-serif text-sm font-semibold text-[#A88B54]">
                                             {inq.company
                                                 .charAt(0)
                                                 .toUpperCase()}
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <p className="truncate text-sm font-medium text-gray-900">
+                                            <p className="truncate font-sans text-sm font-semibold text-[#16233B]">
                                                 {inq.name}
                                             </p>
-                                            <p className="truncate text-xs text-gray-500">
+                                            <p className="truncate font-sans text-xs text-[#6E675D]">
                                                 {inq.company}
                                             </p>
                                         </div>
                                         <div className="shrink-0 text-right">
-                                            <p className="text-xs text-gray-500">
+                                            <p className="mb-1 font-sans text-xs text-[#6E675D]">
                                                 {inq.needed_date}
                                             </p>
                                             <Badge
@@ -196,34 +180,45 @@ export default function Dashboard({ stats, recent_inquiries }: PageProps) {
 function StatCard({
     label,
     value,
-    gradient,
-    textColor,
-    border = false,
+    variant,
     href,
 }: {
     label: string;
     value: number;
-    gradient: string;
-    textColor: string;
-    border?: boolean;
+    variant: 'navy' | 'softNavy' | 'ivory';
     href: string;
 }) {
+    const styleClass =
+        variant === 'navy'
+            ? 'border-[#A88B54]/45 bg-[#16233B] text-[#F2EBDC]'
+            : variant === 'softNavy'
+              ? 'border-[#A88B54]/55 bg-[#1E2F4D] text-[#F2EBDC]'
+              : 'border-[#A88B54]/25 bg-white text-[#16233B] hover:border-[#A88B54]/60';
+
+    const labelClass =
+        variant === 'ivory' ? 'text-[#6E675D]' : 'text-[#F2EBDC]/80';
+    const iconClass = variant === 'ivory' ? 'text-[#A88B54]' : 'text-[#A88B54]';
+
     return (
         <Link
             href={href}
             className={cn(
-                'relative flex flex-col justify-between rounded-2xl p-4 shadow-sm transition-all hover:shadow-md',
-                `bg-gradient-to-br ${gradient}`,
-                border && 'border border-gray-200',
+                'relative flex flex-col justify-between rounded-2xl border p-5 shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md',
+                styleClass,
             )}
         >
             <div className="flex items-start justify-between">
-                <p className={cn('text-xs font-medium opacity-80', textColor)}>
+                <p
+                    className={cn(
+                        'font-sans text-xs font-semibold tracking-wide uppercase',
+                        labelClass,
+                    )}
+                >
                     {label}
                 </p>
-                <ArrowUpRight className={cn('size-4 opacity-60', textColor)} />
+                <ArrowUpRight className={cn('size-4', iconClass)} />
             </div>
-            <p className={cn('mt-3 text-3xl font-bold', textColor)}>
+            <p className="mt-3 font-serif text-3xl font-semibold">
                 {value.toLocaleString('id-ID')}
             </p>
         </Link>
@@ -247,23 +242,37 @@ function QuickActionCard({
         <Link
             href={href}
             className={cn(
-                'flex flex-col justify-between rounded-2xl border p-4 shadow-sm transition-all hover:shadow-md',
+                'flex flex-col justify-between rounded-2xl border p-5 shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md',
                 highlight
-                    ? 'border-orange-200 bg-orange-50'
-                    : 'border-gray-200 bg-white',
+                    ? 'border-[#A88B54]/55 bg-[#16233B] text-[#F2EBDC]'
+                    : 'border-[#A88B54]/25 bg-white text-[#16233B] hover:border-[#A88B54]/60',
             )}
         >
             <div
                 className={cn(
-                    'text-3xl font-bold',
-                    highlight ? 'text-orange-500' : 'text-gray-900',
+                    'font-serif text-3xl font-semibold',
+                    highlight ? 'text-[#A88B54]' : 'text-[#16233B]',
                 )}
             >
                 {value}
             </div>
             <div>
-                <p className="text-sm font-medium text-gray-800">{label}</p>
-                <p className="mt-0.5 text-xs text-gray-400">{note}</p>
+                <p
+                    className={cn(
+                        'font-sans text-sm font-semibold',
+                        highlight ? 'text-[#F2EBDC]' : 'text-[#16233B]',
+                    )}
+                >
+                    {label}
+                </p>
+                <p
+                    className={cn(
+                        'mt-0.5 font-sans text-xs',
+                        highlight ? 'text-[#F2EBDC]/75' : 'text-[#6E675D]',
+                    )}
+                >
+                    {note}
+                </p>
             </div>
         </Link>
     );

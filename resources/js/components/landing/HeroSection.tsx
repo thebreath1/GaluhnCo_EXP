@@ -1,64 +1,63 @@
+import { Link, usePage } from '@inertiajs/react';
 import type { Variants } from 'motion/react';
 import { motion, useInView, useReducedMotion } from 'motion/react';
-import { useRef, useState, useEffect } from 'react';
-import { ArrowRightIcon, MessageCircleIcon } from 'lucide-react';
+import { ArrowRightIcon, SparklesIcon } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import B2BCustomizerController from '@/actions/App/Http/Controllers/B2BCustomizerController';
+import PromoMarquee from '@/components/landing/PromoMarquee';
 import { getCmsText, type SectionContent } from '@/components/landing/cms';
+import type { SharedPageProps } from '@/types';
 import type { Product } from '@/types/product';
 
 interface HeroSectionProps {
     products?: Product[];
     content?: SectionContent;
+    seasonalContent?: SectionContent;
 }
 
-const DEFAULT_HERO_PHOTOS = [
-    'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&q=75&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&q=75&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1512909006721-3d6018887383?w=600&q=75&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1577998474517-7eeeed4e448a?w=600&q=75&auto=format&fit=crop',
-];
+type SeasonThemeKey = 'default' | 'ramadan' | 'christmas' | 'cny' | 'wedding';
 
-// Tiap lingkaran punya origin arah masuk dari dalam (skala kecil di tengah lalu mekar)
-const CIRCLE_CONFIGS = [
-    {
-        id: 'top-left',
-        positionClass: 'left-2 top-20 lg:left-8 lg:top-20 xl:left-14',
-        sizeClass: 'size-32 md:size-40 lg:size-48',
-        floatY: -12,
-        floatDuration: 5.2,
-        revealDelay: 0.55,
-    },
-    {
-        id: 'top-right',
-        positionClass: 'right-2 top-24 lg:right-8 lg:top-24 xl:right-14',
-        sizeClass: 'size-28 md:size-36 lg:size-44',
-        floatY: 10,
-        floatDuration: 6,
-        revealDelay: 0.65,
-    },
-    {
-        id: 'bottom-left',
-        positionClass: 'bottom-8 left-4 lg:bottom-10 lg:left-12 xl:left-20',
-        sizeClass: 'size-36 md:size-44 lg:size-52',
-        floatY: -10,
-        floatDuration: 5.6,
-        revealDelay: 0.6,
-    },
-    {
-        id: 'bottom-right',
-        positionClass: 'bottom-10 right-4 lg:bottom-12 lg:right-12 xl:right-20',
-        sizeClass: 'size-30 md:size-36 lg:size-44',
-        floatY: 12,
-        floatDuration: 4.8,
-        revealDelay: 0.7,
-    },
-];
+interface SeasonThemeConfig {
+    eyebrowFallback: string;
+    cutoutImage: string;
+    cutoutAlt: string;
+}
 
-const WA_HERO_URL =
-    'https://wa.me/6281779839434?text=Halo%20Galuh%20%26%20Co.%2C%20saya%20tertarik%20untuk%20konsultasi%20pemesanan%20hampers.';
+const SEASONAL_THEMES: Record<SeasonThemeKey, SeasonThemeConfig> = {
+    default: {
+        eyebrowFallback: 'Signature Luxury Collection',
+        cutoutImage: '/asset/hero/parcel-default.svg',
+        cutoutAlt:
+            'Kurasi Gift Box Mewah Galuh & Co. dengan pita satin Muted Brass',
+    },
+    ramadan: {
+        eyebrowFallback: 'RAMADAN CURATION 2026',
+        cutoutImage: '/asset/hero/parcel-ramadan.svg',
+        cutoutAlt:
+            'Hampers Ramadan & Idul Fitri Galuh & Co. dengan ornamen ketupat emas',
+    },
+    christmas: {
+        eyebrowFallback: 'NOEL & YEAR END 2026',
+        cutoutImage: '/asset/hero/parcel-christmas.svg',
+        cutoutAlt:
+            'Hampers Natal & Akhir Tahun Galuh & Co. dengan aksen pinus dan pita emas',
+    },
+    cny: {
+        eyebrowFallback: 'LUNAR PROSPERITY EDITION',
+        cutoutImage: '/asset/hero/parcel-cny.svg',
+        cutoutAlt:
+            'Hampers Imlek Galuh & Co. dengan simpul sutra emas dan kemasan mewah',
+    },
+    wedding: {
+        eyebrowFallback: 'BESPOKE WEDDING & SOUVENIR',
+        cutoutImage: '/asset/hero/parcel-wedding.svg',
+        cutoutAlt:
+            'Keepsake Box Pernikahan & Souvenir Galuh & Co. dengan segel lilin eksklusif',
+    },
+};
 
 const ROTATING_WORDS = ['Istimewa', 'Korporat', 'Hari Raya', 'Pernikahan'];
 
-// ── Rotating Typewriter Hook ──────────────────────────────────────────────────
 type Phase = 'typing' | 'pausing' | 'erasing' | 'switching';
 
 interface TypewriterState {
@@ -162,68 +161,236 @@ function useRotatingTypewriter(
     };
 }
 
-function longestWord(words: string[]) {
+function longestWord(words: string[]): string {
     return words.reduce((a, b) => (b.length > a.length ? b : a), '');
 }
 
-// ── Motion variants ───────────────────────────────────────────────────────────
+function resolveSeasonTheme(rawTheme: string): SeasonThemeKey {
+    const normalized = rawTheme.trim().toLowerCase();
+    if (
+        normalized === 'ramadan' ||
+        normalized === 'christmas' ||
+        normalized === 'cny' ||
+        normalized === 'wedding'
+    ) {
+        return normalized;
+    }
+    return 'default';
+}
 
-// Pita emas latar: fade in dulu, lalu elemen lain menyusul
-const ribbonVariant: Variants = {
-    hidden: { opacity: 0, scaleX: 0.6 },
-    visible: {
-        opacity: 1,
-        scaleX: 1,
-        transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
-    },
-};
+function SeasonalOrnament({ theme }: { theme: SeasonThemeKey }) {
+    if (theme === 'ramadan') {
+        return (
+            <svg
+                aria-hidden="true"
+                viewBox="0 0 420 420"
+                fill="none"
+                className="pointer-events-none absolute inset-0 m-auto size-[340px] text-[#A88B54] opacity-25 sm:size-[420px]"
+            >
+                <circle
+                    cx="210"
+                    cy="210"
+                    r="186"
+                    stroke="currentColor"
+                    strokeWidth="0.9"
+                    strokeDasharray="6 6"
+                />
+                <path
+                    d="M210 38 L256 164 L382 210 L256 256 L210 382 L164 256 L38 210 L164 164 Z"
+                    stroke="currentColor"
+                    strokeWidth="0.85"
+                />
+                <circle
+                    cx="210"
+                    cy="210"
+                    r="128"
+                    stroke="currentColor"
+                    strokeWidth="0.75"
+                />
+                <path
+                    d="M286 84 A72 72 0 1 0 342 152 A56 56 0 1 1 286 84 Z"
+                    stroke="currentColor"
+                    strokeWidth="0.9"
+                />
+            </svg>
+        );
+    }
 
-// Blok tipografi tengah: scale + opacity
-const heroContentVariant: Variants = {
-    hidden: { opacity: 0, scale: 0.96 },
-    visible: {
-        opacity: 1,
-        scale: 1,
-        transition: { duration: 0.65, delay: 0.18, ease: [0.16, 1, 0.3, 1] },
-    },
-};
+    if (theme === 'christmas') {
+        return (
+            <svg
+                aria-hidden="true"
+                viewBox="0 0 420 420"
+                fill="none"
+                className="pointer-events-none absolute inset-0 m-auto size-[340px] text-[#A88B54] opacity-25 sm:size-[420px]"
+            >
+                <circle
+                    cx="210"
+                    cy="210"
+                    r="184"
+                    stroke="currentColor"
+                    strokeWidth="0.85"
+                    strokeDasharray="4 7"
+                />
+                <path
+                    d="M210 30 L210 390 M30 210 L390 210 M82 82 L338 338 M338 82 L82 338"
+                    stroke="currentColor"
+                    strokeWidth="0.7"
+                />
+                <circle
+                    cx="210"
+                    cy="210"
+                    r="120"
+                    stroke="currentColor"
+                    strokeWidth="0.8"
+                />
+            </svg>
+        );
+    }
 
-// Container stagger untuk anak-anak konten
+    if (theme === 'cny') {
+        return (
+            <svg
+                aria-hidden="true"
+                viewBox="0 0 420 420"
+                fill="none"
+                className="pointer-events-none absolute inset-0 m-auto size-[340px] text-[#A88B54] opacity-25 sm:size-[420px]"
+            >
+                <circle
+                    cx="210"
+                    cy="210"
+                    r="186"
+                    stroke="currentColor"
+                    strokeWidth="0.9"
+                />
+                <circle
+                    cx="210"
+                    cy="210"
+                    r="164"
+                    stroke="currentColor"
+                    strokeWidth="0.75"
+                    strokeDasharray="8 5"
+                />
+                <rect
+                    x="118"
+                    y="118"
+                    width="184"
+                    height="184"
+                    rx="12"
+                    transform="rotate(45 210 210)"
+                    stroke="currentColor"
+                    strokeWidth="0.85"
+                />
+            </svg>
+        );
+    }
+
+    return (
+        <svg
+            aria-hidden="true"
+            viewBox="0 0 420 420"
+            fill="none"
+            className="pointer-events-none absolute inset-0 m-auto size-[340px] text-[#A88B54] opacity-25 sm:size-[420px]"
+        >
+            <circle
+                cx="210"
+                cy="210"
+                r="186"
+                stroke="currentColor"
+                strokeWidth="0.9"
+                strokeDasharray="5 6"
+            />
+            <ellipse
+                cx="210"
+                cy="210"
+                rx="195"
+                ry="118"
+                transform="rotate(-24 210 210)"
+                stroke="currentColor"
+                strokeWidth="0.75"
+            />
+            <ellipse
+                cx="210"
+                cy="210"
+                rx="195"
+                ry="118"
+                transform="rotate(24 210 210)"
+                stroke="currentColor"
+                strokeWidth="0.75"
+            />
+        </svg>
+    );
+}
+
 const staggerContainer: Variants = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,
-        transition: { staggerChildren: 0.13, delayChildren: 0.22 },
+        transition: { staggerChildren: 0.1, delayChildren: 0.08 },
     },
 };
 
 const fadeUpChild: Variants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 18 },
     visible: {
         opacity: 1,
         y: 0,
-        transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+        transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as const },
     },
 };
 
 export default function HeroSection({
-    products = [],
     content,
+    seasonalContent,
 }: HeroSectionProps) {
-    // Motion/react hook — otomatis false di SSR, true di browser jika reduced motion aktif
     const shouldReduceMotion = useReducedMotion() ?? false;
+    const { seasonalRibbon } = usePage<SharedPageProps>().props;
+
+    const seasonThemeKey = resolveSeasonTheme(
+        getCmsText(content, 'hero_season_theme', 'ramadan'),
+    );
+    const theme = SEASONAL_THEMES[seasonThemeKey];
+
+    const isSeasonalActive =
+        seasonalContent?.seasonal_ribbon_active !== undefined &&
+        seasonalContent?.seasonal_ribbon_active !== null
+            ? seasonalContent.seasonal_ribbon_active === '1'
+            : (seasonalRibbon?.active ?? false);
+
+    const seasonalText = (
+        seasonalContent?.seasonal_ribbon_text ??
+        seasonalRibbon?.text ??
+        ''
+    ).trim();
+
+    const seasonalLink = (
+        seasonalContent?.seasonal_ribbon_link ??
+        seasonalRibbon?.link ??
+        ''
+    ).trim();
+
+    const heroSeasonEyebrow = getCmsText(
+        content,
+        'hero_season_eyebrow',
+        '',
+    ).trim();
+    const hasSeasonalAnnouncement = isSeasonalActive && seasonalText !== '';
+    const eyebrowText = hasSeasonalAnnouncement
+        ? seasonalText
+        : heroSeasonEyebrow ||
+          getCmsText(content, 'eyebrow', theme.eyebrowFallback);
+    const isClickableEyebrow = hasSeasonalAnnouncement && seasonalLink !== '';
 
     const rawWords = getCmsText(
         content,
         'rotating_words',
         ROTATING_WORDS.join(','),
     );
-    const rotatingWords = rawWords
+    const parsedWords = rawWords
         .split(',')
         .map((w) => w.trim())
         .filter(Boolean);
-    const activeWords =
-        rotatingWords.length > 0 ? rotatingWords : ROTATING_WORDS;
+    const activeWords = parsedWords.length > 0 ? parsedWords : ROTATING_WORDS;
 
     const headlineRef = useRef<HTMLHeadingElement>(null);
     const inView = useInView(headlineRef, { once: true, margin: '-80px' });
@@ -237,11 +404,6 @@ export default function HeroSection({
         reducedMotion: shouldReduceMotion,
     });
 
-    const eyebrowText = getCmsText(
-        content,
-        'eyebrow',
-        'Curated Luxury Hampers & Corporate Gifting',
-    );
     const headlineLine1 = getCmsText(
         content,
         'headline_line_1',
@@ -252,36 +414,22 @@ export default function HeroSection({
         'headline_line_2',
         'dalam Setiap Bingkisan',
     );
-    const subheadlineText = getCmsText(
-        content,
-        'subheadline',
-        'Kurasi hampers eksklusif dengan kemasan penuh estetika dan sentuhan personal untuk merayakan momen berharga bersama orang terdekat maupun relasi bisnis.',
-    );
-    const primaryCtaLabel = getCmsText(
-        content,
-        'primary_cta_label',
-        'Lihat Koleksi',
-    );
-    const secondaryCtaLabel = getCmsText(
-        content,
-        'secondary_cta_label',
-        'Pesan via WhatsApp',
-    );
+    const subtitleText =
+        getCmsText(content, 'hero_subtitle', '').trim() ||
+        getCmsText(
+            content,
+            'subheadline',
+            'Kurasi hampers eksklusif dengan kemasan penuh estetika dan sentuhan personal untuk merayakan momen berharga bersama orang terdekat maupun relasi bisnis.',
+        );
 
-    const productsWithImages = products.filter(
-        (p) => Boolean(p.image_url) && p.image_url !== '',
-    );
+    const primaryCtaText =
+        getCmsText(content, 'hero_cta_text', '').trim() ||
+        getCmsText(content, 'primary_cta_label', 'Jelajahi Koleksi');
+    const primaryCtaLink =
+        getCmsText(content, 'hero_cta_link', '').trim() || '#koleksi';
 
-    const heroImages = CIRCLE_CONFIGS.map((cfg, index) => {
-        const prod = productsWithImages[index];
-        return {
-            ...cfg,
-            src: prod?.image_url ?? DEFAULT_HERO_PHOTOS[index] ?? '',
-            alt:
-                prod?.name ??
-                'Koleksi hampers mewah Galuh & Co. dengan pita satin emas',
-        };
-    });
+    const uploadedHeroImage = getCmsText(content, 'hero_image', '').trim();
+    const activeCutoutImage = uploadedHeroImage || theme.cutoutImage;
 
     const handleSmoothScroll = (
         e: React.MouseEvent<HTMLAnchorElement>,
@@ -293,9 +441,35 @@ export default function HeroSection({
             ?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    const primaryCtaClasses =
+        'group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#A88B54] px-7 py-3.5 font-sans text-sm font-semibold tracking-wide text-[#16233B] shadow-lg shadow-[#A88B54]/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#B89B64] active:scale-[0.98] sm:w-auto sm:text-base';
+
+    const eyebrowPillClasses =
+        'group inline-flex max-w-full items-center gap-2.5 rounded-full border border-[#A88B54]/40 bg-[#1E2F4D]/80 px-4 py-1.5 backdrop-blur-sm transition-colors duration-200';
+
+    const clickableEyebrowInner = (
+        <>
+            <SparklesIcon className="size-3.5 shrink-0 text-[#A88B54]" />
+            <span className="truncate font-sans text-[11px] font-semibold tracking-[0.14em] text-[#F2EBDC] uppercase">
+                {eyebrowText}
+            </span>
+            <ArrowRightIcon className="size-3.5 shrink-0 text-[#A88B54] transition-transform duration-200 group-hover:translate-x-0.5" />
+        </>
+    );
+
     return (
-        <section className="relative flex min-h-[92vh] items-center justify-center overflow-hidden bg-[#16233B] px-6 pt-28 pb-16 md:pt-36 md:pb-24">
-            {/* ── 1. Grain texture — inline SVG data-URI, zero network request ── */}
+        <section className="relative flex min-h-[92vh] flex-col justify-between overflow-hidden bg-[#16233B] text-[#F2EBDC]">
+            {/* ── 1. Atmospheric Dark Navy & Brass Radial Glows ── */}
+            <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 z-0"
+                style={{
+                    background:
+                        'radial-gradient(ellipse 68% 58% at 72% 42%, rgba(30,47,77,0.88) 0%, rgba(22,35,59,0) 72%), radial-gradient(circle at 22% 24%, rgba(168,139,84,0.12) 0%, transparent 48%), radial-gradient(circle at 82% 76%, rgba(168,139,84,0.10) 0%, transparent 50%)',
+                }}
+            />
+
+            {/* ── 2. Subtle Atmospheric Grain Texture ── */}
             <div
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0 z-[1] opacity-[0.045]"
@@ -306,190 +480,85 @@ export default function HeroSection({
                 }}
             />
 
-            {/* ── 2. Hairline inner frame — kesan bingkai tutup kotak hampers ── */}
-            <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-3 z-[2] rounded-2xl sm:inset-4 md:inset-5"
-                style={{ boxShadow: 'inset 0 0 0 1px rgba(168,139,84,0.25)' }}
-            />
-
-            {/* ── 3. Pita brass horizontal — latar detail kreatif ── */}
-            {/* Muncul pertama dalam urutan unboxing (ribbonVariant) */}
-            <motion.div
-                aria-hidden="true"
-                variants={shouldReduceMotion ? undefined : ribbonVariant}
-                initial={shouldReduceMotion ? undefined : 'hidden'}
-                animate={shouldReduceMotion ? undefined : 'visible'}
-                className="pointer-events-none absolute top-1/2 right-0 left-0 z-[2] -translate-y-1/2"
-            >
-                {/* Garis horizontal utama */}
-                <div
-                    className="h-px w-full"
-                    style={{
-                        background:
-                            'linear-gradient(to right, transparent 0%, rgba(168,139,84,0.18) 15%, rgba(168,139,84,0.28) 50%, rgba(168,139,84,0.18) 85%, transparent 100%)',
-                    }}
-                />
-                {/* Garis horizontal kedua — lebih tipis, 1px di bawah */}
-                <div
-                    className="mt-[3px] h-px w-full"
-                    style={{
-                        background:
-                            'linear-gradient(to right, transparent 0%, rgba(168,139,84,0.09) 20%, rgba(168,139,84,0.15) 50%, rgba(168,139,84,0.09) 80%, transparent 100%)',
-                    }}
-                />
-            </motion.div>
-
-            {/* ── 4. Pita brass vertikal — melengkapi motif tanda silang pita ── */}
-            <motion.div
-                aria-hidden="true"
-                variants={shouldReduceMotion ? undefined : ribbonVariant}
-                initial={shouldReduceMotion ? undefined : 'hidden'}
-                animate={shouldReduceMotion ? undefined : 'visible'}
-                className="pointer-events-none absolute top-0 bottom-0 left-1/2 z-[2] -translate-x-1/2"
-            >
-                <div
-                    className="h-full w-px"
-                    style={{
-                        background:
-                            'linear-gradient(to bottom, transparent 0%, rgba(168,139,84,0.18) 15%, rgba(168,139,84,0.28) 50%, rgba(168,139,84,0.18) 85%, transparent 100%)',
-                    }}
-                />
-            </motion.div>
-
-            {/* ── 5. Ambient radial glows ── */}
-            <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-            >
-                <div className="absolute top-1/4 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#A88B54]/12 blur-[130px] sm:h-[650px] sm:w-[650px]" />
-                <div className="absolute top-1/2 -left-20 h-80 w-80 rounded-full bg-[#A88B54]/10 blur-[100px]" />
-                <div className="absolute top-1/2 -right-20 h-80 w-80 rounded-full bg-[#A88B54]/10 blur-[100px]" />
-            </div>
-
-            {/* ── 6. Foto lingkaran — mekar dari tengah ke posisi sudut ── */}
-            {heroImages.map((img) => (
-                <motion.div
-                    key={img.id}
-                    initial={
-                        shouldReduceMotion
-                            ? undefined
-                            : { opacity: 0, scale: 0.55 }
-                    }
-                    animate={
-                        shouldReduceMotion
-                            ? undefined
-                            : {
-                                  opacity: 1,
-                                  scale: 1,
-                                  y: [0, img.floatY, 0],
-                              }
-                    }
-                    transition={
-                        shouldReduceMotion
-                            ? undefined
-                            : {
-                                  opacity: {
-                                      duration: 0.6,
-                                      delay: img.revealDelay,
-                                  },
-                                  scale: {
-                                      duration: 0.75,
-                                      delay: img.revealDelay,
-                                      ease: [0.16, 1, 0.3, 1],
-                                  },
-                                  y: {
-                                      duration: img.floatDuration,
-                                      repeat: Infinity,
-                                      ease: 'easeInOut',
-                                      // float mulai setelah reveal selesai
-                                      delay: img.revealDelay + 0.75,
-                                  },
-                              }
-                    }
-                    className={`absolute z-10 hidden md:block ${img.positionClass}`}
-                >
-                    <div className="pointer-events-none absolute inset-0 -m-4 rounded-full bg-[#A88B54]/20 blur-2xl" />
-                    <div
-                        className={`relative ${img.sizeClass} overflow-hidden rounded-full border border-[#A88B54]/45 shadow-[0_0_45px_rgba(168,139,84,0.25)] transition-transform duration-500 hover:scale-105`}
-                    >
-                        <img
-                            src={img.src}
-                            alt={img.alt}
-                            className="h-full w-full object-cover"
-                            loading="eager"
-                            decoding="async"
-                            fetchPriority={
-                                img.id === 'top-left' || img.id === 'top-right'
-                                    ? 'high'
-                                    : 'auto'
-                            }
-                        />
-                    </div>
-                </motion.div>
-            ))}
-
-            {/* ── 7. Konten tengah — reveal scale + opacity setelah pita ── */}
-            <div className="relative z-20 mx-auto w-full max-w-7xl">
-                <motion.div
-                    variants={
-                        shouldReduceMotion ? undefined : heroContentVariant
-                    }
-                    initial={shouldReduceMotion ? undefined : 'hidden'}
-                    animate={shouldReduceMotion ? undefined : 'visible'}
-                >
+            {/* ── 3. Split Hero Main Area (2 Kolom) ── */}
+            <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 items-center px-6 pt-28 pb-10 sm:pt-32 md:pb-14">
+                <div className="grid w-full grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-8">
+                    {/* Kolom Kiri: Editorial Copy & CTA */}
                     <motion.div
                         variants={
                             shouldReduceMotion ? undefined : staggerContainer
                         }
                         initial={shouldReduceMotion ? undefined : 'hidden'}
                         animate={shouldReduceMotion ? undefined : 'visible'}
-                        className="mx-auto flex max-w-2xl flex-col items-center text-center"
+                        className="flex flex-col items-start text-left lg:col-span-6"
                     >
-                        {/* Eyebrow pill */}
+                        {/* Single Dynamic Seasonal Eyebrow Pill */}
                         <motion.div
                             variants={
                                 shouldReduceMotion ? undefined : fadeUpChild
                             }
+                            className="mb-5 max-w-full"
                         >
-                            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#A88B54]/45 bg-[#A88B54]/15 px-4 py-1.5 backdrop-blur-sm">
-                                <span className="size-1.5 animate-pulse rounded-full bg-[#A88B54]" />
-                                <span className="font-sans text-[10px] font-semibold tracking-[0.24em] text-[#F2EBDC] uppercase sm:text-xs">
-                                    {eyebrowText}
-                                </span>
-                            </div>
+                            {isClickableEyebrow ? (
+                                seasonalLink.startsWith('#') ? (
+                                    <a
+                                        href={seasonalLink}
+                                        onClick={(e) =>
+                                            handleSmoothScroll(e, seasonalLink)
+                                        }
+                                        className={`${eyebrowPillClasses} hover:border-[#A88B54]/70 hover:bg-[#1E2F4D]`}
+                                    >
+                                        {clickableEyebrowInner}
+                                    </a>
+                                ) : seasonalLink.startsWith('/') ? (
+                                    <Link
+                                        href={seasonalLink}
+                                        className={`${eyebrowPillClasses} hover:border-[#A88B54]/70 hover:bg-[#1E2F4D]`}
+                                    >
+                                        {clickableEyebrowInner}
+                                    </Link>
+                                ) : (
+                                    <a
+                                        href={seasonalLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`${eyebrowPillClasses} hover:border-[#A88B54]/70 hover:bg-[#1E2F4D]`}
+                                    >
+                                        {clickableEyebrowInner}
+                                    </a>
+                                )
+                            ) : (
+                                <div className={eyebrowPillClasses}>
+                                    <span className="size-1.5 shrink-0 animate-pulse rounded-full bg-[#A88B54]" />
+                                    <span className="font-sans text-[11px] font-semibold tracking-[0.18em] text-[#F2EBDC] uppercase">
+                                        {eyebrowText}
+                                    </span>
+                                </div>
+                            )}
                         </motion.div>
 
-                        {/* Headline + rotating typewriter */}
+                        {/* Headline Warm Ivory + RotatingTypewriter */}
                         <motion.h1
                             ref={headlineRef}
                             variants={
                                 shouldReduceMotion ? undefined : fadeUpChild
                             }
                             aria-label={`${headlineLine1} ${headlineLine2} ${activeWords[0]}`}
-                            className="font-serif text-3xl leading-[1.18] font-normal tracking-normal text-[#F2EBDC] sm:text-5xl md:text-6xl lg:text-[4.25rem]"
+                            className="font-serif text-4xl leading-[1.12] font-normal tracking-normal text-[#F2EBDC] sm:text-5xl xl:text-[3.75rem]"
                         >
-                            {/* Baris 1: statis */}
                             <span className="block" aria-hidden="true">
                                 {headlineLine1}
                             </span>
 
-                            {/*
-                             * Baris 2: "dalam Setiap Bingkisan" + kata rotating
-                             * Pakai inline-flex items-baseline agar kata rotating
-                             * tidak turun ke baris baru saat kosong saat dihapus.
-                             */}
                             <span
-                                className="mt-1 flex flex-wrap items-baseline justify-center gap-x-[0.3em] italic sm:mt-0"
+                                className="mt-1 flex flex-wrap items-baseline gap-x-[0.28em] italic"
                                 aria-hidden="true"
                             >
                                 <span className="whitespace-nowrap">
                                     {headlineLine2}
                                 </span>
 
-                                {/* Container kata rotating — lebar dikunci ghost text */}
                                 <span className="relative inline-block">
-                                    {/* Ghost text untuk lock min-width (kata terpanjang) */}
                                     <span
                                         className="invisible whitespace-nowrap select-none"
                                         aria-hidden="true"
@@ -497,17 +566,15 @@ export default function HeroSection({
                                         {longestWord(activeWords)}
                                     </span>
 
-                                    {/* Kata aktual overlay */}
                                     <span className="absolute inset-0 flex items-baseline justify-start">
                                         <span className="whitespace-nowrap text-[#A88B54]">
                                             {displayText}
                                         </span>
 
-                                        {/* Kursor muted brass — smooth blink */}
                                         <span
                                             aria-hidden="true"
                                             className={[
-                                                'ml-[2px] inline-block w-[1.5px] self-stretch rounded-full bg-[#A88B54]',
+                                                'ml-[3px] inline-block w-[2px] self-stretch rounded-full bg-[#A88B54]',
                                                 'animate-cursor-blink',
                                                 !isTyping && !shouldReduceMotion
                                                     ? 'opacity-0'
@@ -519,89 +586,131 @@ export default function HeroSection({
                             </span>
                         </motion.h1>
 
-                        {/* Subheadline */}
+                        {/* Subtitle Manrope */}
                         <motion.p
                             variants={
                                 shouldReduceMotion ? undefined : fadeUpChild
                             }
-                            className="mt-6 max-w-xl font-sans text-sm leading-relaxed font-normal text-[#F2EBDC]/85 sm:text-base md:text-lg"
+                            className="mt-6 max-w-xl font-sans text-sm leading-relaxed font-normal text-[#F2EBDC]/80 sm:text-base md:text-[17px]"
                         >
-                            {subheadlineText}
+                            {subtitleText}
                         </motion.p>
 
-                        {/* CTA buttons */}
+                        {/* Dual CTAs */}
                         <motion.div
                             variants={
                                 shouldReduceMotion ? undefined : fadeUpChild
                             }
-                            className="mt-8 flex w-full flex-col items-center justify-center gap-4 sm:mt-10 sm:w-auto sm:flex-row"
+                            className="mt-8 flex w-full flex-col items-stretch gap-3.5 sm:w-auto sm:flex-row sm:items-center"
                         >
-                            <a
-                                href="#koleksi"
-                                onClick={(e) =>
-                                    handleSmoothScroll(e, '#koleksi')
-                                }
-                                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#A88B54] px-8 py-3.5 font-sans text-sm font-semibold tracking-wide text-[#16233B] shadow-lg shadow-[#A88B54]/20 transition-all duration-300 hover:scale-[1.02] hover:bg-[#B89B64] hover:shadow-[#A88B54]/30 active:scale-[0.98] sm:w-auto sm:text-base"
-                            >
-                                {primaryCtaLabel}
-                                <ArrowRightIcon className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-                            </a>
-
-                            <a
-                                href={WA_HERO_URL}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#F2EBDC]/45 px-8 py-3.5 font-sans text-sm font-medium tracking-wide text-[#F2EBDC] backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-[#F2EBDC]/10 active:scale-[0.98] sm:w-auto sm:text-base"
-                            >
-                                <MessageCircleIcon className="size-4 text-[#A88B54]" />
-                                {secondaryCtaLabel}
-                            </a>
-                        </motion.div>
-
-                        {/* Lingkaran foto — mobile row */}
-                        <motion.div
-                            variants={
-                                shouldReduceMotion ? undefined : fadeUpChild
-                            }
-                            className="mt-12 flex items-center justify-center gap-3 sm:gap-4 md:hidden"
-                        >
-                            {heroImages.map((img, idx) => (
-                                <motion.div
-                                    key={img.id}
-                                    initial={
-                                        shouldReduceMotion
-                                            ? undefined
-                                            : { opacity: 0, scale: 0.8 }
+                            {primaryCtaLink.startsWith('#') ? (
+                                <a
+                                    href={primaryCtaLink}
+                                    onClick={(e) =>
+                                        handleSmoothScroll(e, primaryCtaLink)
                                     }
-                                    animate={
-                                        shouldReduceMotion
-                                            ? undefined
-                                            : { opacity: 1, scale: 1 }
-                                    }
-                                    transition={
-                                        shouldReduceMotion
-                                            ? undefined
-                                            : {
-                                                  duration: 0.5,
-                                                  delay: 0.35 + idx * 0.08,
-                                              }
-                                    }
+                                    className={primaryCtaClasses}
                                 >
-                                    <div className="size-16 overflow-hidden rounded-full border border-[#A88B54]/45 shadow-[0_0_25px_rgba(168,139,84,0.22)] sm:size-20">
-                                        <img
-                                            src={img.src}
-                                            alt={img.alt}
-                                            className="h-full w-full object-cover"
-                                            loading="eager"
-                                            decoding="async"
-                                        />
-                                    </div>
-                                </motion.div>
-                            ))}
+                                    <span>{primaryCtaText}</span>
+                                    <ArrowRightIcon className="size-4 text-[#16233B] transition-transform duration-300 group-hover:translate-x-0.5" />
+                                </a>
+                            ) : primaryCtaLink.startsWith('/') ? (
+                                <Link
+                                    href={primaryCtaLink}
+                                    className={primaryCtaClasses}
+                                >
+                                    <span>{primaryCtaText}</span>
+                                    <ArrowRightIcon className="size-4 text-[#16233B] transition-transform duration-300 group-hover:translate-x-0.5" />
+                                </Link>
+                            ) : (
+                                <a
+                                    href={primaryCtaLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={primaryCtaClasses}
+                                >
+                                    <span>{primaryCtaText}</span>
+                                    <ArrowRightIcon className="size-4 text-[#16233B] transition-transform duration-300 group-hover:translate-x-0.5" />
+                                </a>
+                            )}
+
+                            <Link
+                                href={B2BCustomizerController.index()}
+                                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#F2EBDC]/30 bg-transparent px-7 py-3.5 font-sans text-sm font-semibold tracking-wide text-[#F2EBDC] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#A88B54]/70 hover:bg-white/5 active:scale-[0.98] sm:w-auto sm:text-base"
+                            >
+                                <SparklesIcon className="size-4 text-[#A88B54]" />
+                                <span>Rancang Box 3D</span>
+                            </Link>
                         </motion.div>
                     </motion.div>
-                </motion.div>
+
+                    {/* Kolom Kanan: Transparent Cutout Parcel Showcase Tanpa Bingkai Kartu */}
+                    <div className="relative flex items-center justify-center lg:col-span-6">
+                        {/* Radial Ambient Glow di Belakang Parsel */}
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute m-auto size-72 rounded-full bg-[#A88B54]/15 blur-3xl sm:size-96"
+                        />
+
+                        {/* Ornamen Vektor Garis Tipis Emas Minimal Sesuai Musim */}
+                        <SeasonalOrnament theme={seasonThemeKey} />
+
+                        {/* Cutout Parsel Melayang — Klik Menuju 3D Studio */}
+                        <Link
+                            href={B2BCustomizerController.index()}
+                            aria-label="Rancang Box 3D di Studio Customizer Galuh & Co."
+                            className="group relative z-10 block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#A88B54]"
+                        >
+                            <motion.div
+                                initial={
+                                    shouldReduceMotion
+                                        ? undefined
+                                        : { opacity: 0, scale: 0.94, y: 12 }
+                                }
+                                animate={
+                                    shouldReduceMotion
+                                        ? undefined
+                                        : {
+                                              opacity: 1,
+                                              scale: 1,
+                                              y: [0, -10, 0],
+                                          }
+                                }
+                                transition={
+                                    shouldReduceMotion
+                                        ? undefined
+                                        : {
+                                              opacity: { duration: 0.6 },
+                                              scale: {
+                                                  duration: 0.7,
+                                                  ease: [
+                                                      0.16, 1, 0.3, 1,
+                                                  ] as const,
+                                              },
+                                              y: {
+                                                  duration: 5.5,
+                                                  repeat: Infinity,
+                                                  ease: 'easeInOut',
+                                              },
+                                          }
+                                }
+                            >
+                                <img
+                                    src={activeCutoutImage}
+                                    alt={theme.cutoutAlt}
+                                    loading="eager"
+                                    decoding="async"
+                                    fetchPriority="high"
+                                    className="mx-auto w-full max-w-[330px] object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.55)] transition-transform duration-500 group-hover:scale-[1.03] sm:max-w-[430px] lg:max-w-[460px]"
+                                />
+                            </motion.div>
+                        </Link>
+                    </div>
+                </div>
             </div>
+
+            {/* ── 4. Luxury Promo Marquee di Bawah Hero ── */}
+            <PromoMarquee itemsRaw={content?.promo_marquee_items} />
         </section>
     );
 }

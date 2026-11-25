@@ -5,10 +5,9 @@ import type { GroupedLandingContent } from '@/components/landing/cms';
 import type { Product } from '@/types/product';
 
 // ── Above-the-fold — eager import (LCP critical path) ────────────────────────
-import Navbar from '@/components/landing/Navbar';
 import HeroSection from '@/components/landing/HeroSection';
 import AboutSection from '@/components/landing/AboutSection';
-import FloatingWhatsApp from '@/components/landing/FloatingWhatsApp';
+import StorefrontLayout from '@/layouts/StorefrontLayout';
 
 // ── Below-the-fold — lazy import (code-split, downloaded after FCP) ───────────
 const CatalogSection = lazy(
@@ -27,7 +26,9 @@ const TestimonialsSection = lazy(
     () => import('@/components/landing/TestimonialsSection'),
 );
 const FaqSection = lazy(() => import('@/components/landing/FaqSection'));
-const FooterSection = lazy(() => import('@/components/landing/FooterSection'));
+const ClosingCtaSection = lazy(
+    () => import('@/components/landing/ClosingCtaSection'),
+);
 
 export type { Product };
 
@@ -74,10 +75,13 @@ export default function Welcome({
                 />
             </Head>
 
-            <div className="no-scrollbar min-h-screen bg-[#F2EBDC] font-sans text-[#16233B] antialiased selection:bg-[#A88B54]/25 selection:text-[#16233B]">
+            <StorefrontLayout footerContent={contents.footer}>
                 {/* ── Above-the-fold (eager) ── */}
-                <Navbar />
-                <HeroSection products={products} content={contents.hero} />
+                <HeroSection
+                    products={products}
+                    content={contents.hero}
+                    seasonalContent={contents.seasonal}
+                />
                 <AboutSection products={products} content={contents.about} />
 
                 {/* ── Below-the-fold (lazy + Suspense) ── */}
@@ -128,12 +132,9 @@ export default function Welcome({
                 <Suspense
                     fallback={<SectionSkeleton minHeight="min-h-[320px]" />}
                 >
-                    <FooterSection content={contents.footer} />
+                    <ClosingCtaSection content={contents.footer} />
                 </Suspense>
-
-                {/* FloatingWhatsApp — kecil, selalu eager */}
-                <FloatingWhatsApp />
-            </div>
+            </StorefrontLayout>
         </MotionConfig>
     );
 }

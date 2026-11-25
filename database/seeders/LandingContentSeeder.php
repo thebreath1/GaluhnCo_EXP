@@ -13,7 +13,19 @@ class LandingContentSeeder extends Seeder
     public function run(): void
     {
         $entries = [
+            // Seasonal Ribbon
+            ['section' => 'seasonal', 'key' => 'seasonal_ribbon_active', 'value' => '1', 'type' => 'boolean'],
+            ['section' => 'seasonal', 'key' => 'seasonal_ribbon_text', 'value' => 'Edisi Terbatas Ramadan & Idul Fitri — Pemesanan Korporat Kini Dibuka', 'type' => 'text'],
+            ['section' => 'seasonal', 'key' => 'seasonal_ribbon_link', 'value' => '/katalog', 'type' => 'text'],
+
             // Hero
+            ['section' => 'hero', 'key' => 'hero_season_theme', 'value' => 'ramadan', 'type' => 'text'],
+            ['section' => 'hero', 'key' => 'hero_season_eyebrow', 'value' => 'RAMADAN CURATION 2026', 'type' => 'text'],
+            ['section' => 'hero', 'key' => 'hero_title', 'value' => 'Merangkai Kehangatan dalam Setiap Bingkisan Istimewa', 'type' => 'text'],
+            ['section' => 'hero', 'key' => 'hero_subtitle', 'value' => 'Kurasi hampers eksklusif dengan kemasan penuh estetika dan sentuhan personal untuk merayakan momen berharga bersama orang terdekat maupun relasi bisnis.', 'type' => 'textarea'],
+            ['section' => 'hero', 'key' => 'hero_cta_text', 'value' => 'Jelajahi Koleksi', 'type' => 'text'],
+            ['section' => 'hero', 'key' => 'hero_cta_link', 'value' => '#koleksi', 'type' => 'text'],
+            ['section' => 'hero', 'key' => 'promo_marquee_items', 'value' => 'Gratis Kartu Ucapan Kaligrafi Personal | Kustom Logo Perusahaan & Video QR (B2B) | Pengiriman Aman Double-Box Seluruh Indonesia | Kurasi Bahan Artisan Premium | 3D Gift Box Customizer Interaktif', 'type' => 'textarea'],
             ['section' => 'hero', 'key' => 'eyebrow', 'value' => 'Curated Luxury Hampers & Corporate Gifting', 'type' => 'text'],
             ['section' => 'hero', 'key' => 'headline_line_1', 'value' => 'Merangkai Kehangatan', 'type' => 'text'],
             ['section' => 'hero', 'key' => 'headline_line_2', 'value' => 'dalam Setiap Bingkisan', 'type' => 'text'],
@@ -93,5 +105,10 @@ class LandingContentSeeder extends Seeder
                 ],
             );
         }
+
+        LandingContent::firstOrCreate(
+            ['section' => 'hero', 'key' => 'hero_image'],
+            ['value' => null, 'type' => 'image'],
+        );
     }
 }

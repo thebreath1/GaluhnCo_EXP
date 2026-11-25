@@ -130,45 +130,50 @@ export default function PartnersIndex({ partners }: PageProps) {
         <>
             <Head title="Manajemen Partner" />
 
-            <div className="space-y-5 p-6">
+            <div className="space-y-6 p-6 sm:p-8">
                 {/* Header */}
-                <div className="flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-gray-900">
-                        Partner Korporat
-                    </h1>
-                    <Button onClick={openCreate} className="gap-2 rounded-xl">
-                        <PlusIcon className="size-4" />
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#A88B54]/20 pb-5">
+                    <div>
+                        <h1 className="font-serif text-2xl font-normal text-[#16233B] sm:text-3xl">
+                            Partner Korporat
+                        </h1>
+                        <p className="mt-0.5 font-sans text-xs text-[#6E675D] sm:text-sm">
+                            Kelola logo dan daftar perusahaan mitra yang tampil
+                            di halaman depan.
+                        </p>
+                    </div>
+                    <Button
+                        onClick={openCreate}
+                        className="gap-2 rounded-full bg-[#16233B] px-5 text-[#F2EBDC] hover:bg-[#1F304F]"
+                    >
+                        <PlusIcon className="size-4 text-[#A88B54]" />
                         Tambah Partner
                     </Button>
                 </div>
 
                 {/* Summary cards */}
-                <div className="grid grid-cols-3 gap-3">
-                    <div
-                        className="rounded-2xl px-5 py-4 text-white shadow-sm"
-                        style={{ background: '#1a3a2a' }}
-                    >
-                        <p className="text-xs font-medium opacity-80">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div className="rounded-2xl border border-[#A88B54]/40 bg-[#16233B] px-5 py-4 text-[#F2EBDC] shadow-xs">
+                        <p className="font-sans text-xs font-semibold tracking-wider text-[#F2EBDC]/80 uppercase">
                             Total Partner
                         </p>
-                        <p className="mt-1 text-3xl font-bold">
+                        <p className="mt-1 font-serif text-3xl font-semibold">
                             {partners.length}
                         </p>
                     </div>
-                    <div
-                        className="rounded-2xl px-5 py-4 text-white shadow-sm"
-                        style={{ background: '#2d5a3d' }}
-                    >
-                        <p className="text-xs font-medium opacity-80">Aktif</p>
-                        <p className="mt-1 text-3xl font-bold">
+                    <div className="rounded-2xl border border-[#A88B54]/35 bg-[#1E2F4D] px-5 py-4 text-[#F2EBDC] shadow-xs">
+                        <p className="font-sans text-xs font-semibold tracking-wider text-[#F2EBDC]/80 uppercase">
+                            Aktif
+                        </p>
+                        <p className="mt-1 font-serif text-3xl font-semibold text-[#A88B54]">
                             {partners.filter((p) => p.is_active).length}
                         </p>
                     </div>
-                    <div className="rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
-                        <p className="text-xs font-medium text-gray-500">
+                    <div className="rounded-2xl border border-[#A88B54]/25 bg-white px-5 py-4 shadow-xs">
+                        <p className="font-sans text-xs font-semibold tracking-wider text-[#6E675D] uppercase">
                             Nonaktif
                         </p>
-                        <p className="mt-1 text-3xl font-bold text-gray-900">
+                        <p className="mt-1 font-serif text-3xl font-semibold text-[#16233B]">
                             {partners.filter((p) => !p.is_active).length}
                         </p>
                     </div>
@@ -176,52 +181,52 @@ export default function PartnersIndex({ partners }: PageProps) {
 
                 {/* Toolbar */}
                 <div className="flex items-center gap-3">
-                    <div className="flex max-w-xs flex-1 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 shadow-sm">
-                        <SearchIcon className="size-4 shrink-0 text-gray-400" />
+                    <div className="flex max-w-xs flex-1 items-center gap-2 rounded-xl border border-[#A88B54]/30 bg-white px-3.5 py-2 shadow-xs">
+                        <SearchIcon className="size-4 shrink-0 text-[#A88B54]" />
                         <input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Cari nama atau sektor..."
-                            className="flex-1 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
+                            className="flex-1 bg-transparent font-sans text-sm text-[#16233B] outline-none placeholder:text-[#6E675D]/70"
                         />
                     </div>
-                    <span className="text-xs text-gray-400">
+                    <span className="font-sans text-xs font-medium text-[#6E675D]">
                         {filtered.length} partner
                     </span>
                 </div>
 
                 {/* Table */}
-                <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+                <div className="overflow-hidden rounded-2xl border border-[#A88B54]/25 bg-white shadow-xs">
                     <div className="overflow-x-auto">
                         <table className="min-w-full text-sm">
                             <thead>
-                                <tr className="border-b border-gray-100 bg-gray-50/60">
-                                    <th className="w-16 px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                <tr className="border-b border-[#A88B54]/20 bg-[#F2EBDC]/60">
+                                    <th className="w-16 px-4 py-3 text-left text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Logo
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Nama Perusahaan
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Sektor
                                     </th>
-                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Urutan
                                     </th>
-                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Status
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Aksi
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-[#A88B54]/15">
                                 {filtered.length === 0 ? (
                                     <tr>
                                         <td
                                             colSpan={6}
-                                            className="py-12 text-center text-sm text-gray-400"
+                                            className="py-12 text-center font-sans text-sm text-[#6E675D]"
                                         >
                                             {search
                                                 ? 'Tidak ada hasil yang cocok.'
@@ -232,47 +237,42 @@ export default function PartnersIndex({ partners }: PageProps) {
                                     filtered.map((partner) => (
                                         <tr
                                             key={partner.id}
-                                            className="transition-colors hover:bg-gray-50/60"
+                                            className="transition-colors hover:bg-[#FAF7F0]"
                                         >
                                             <td className="px-4 py-3">
                                                 {partner.logo_url ? (
                                                     <img
                                                         src={partner.logo_url}
                                                         alt={partner.name}
-                                                        className="h-11 w-16 rounded-lg object-contain"
-                                                        style={{
-                                                            background:
-                                                                '#f8f8f8',
-                                                            padding: '4px',
-                                                        }}
+                                                        className="h-11 w-16 rounded-lg border border-[#A88B54]/20 bg-[#FAF7F0] object-contain p-1"
                                                     />
                                                 ) : (
-                                                    <div className="flex h-11 w-16 items-center justify-center rounded-lg bg-gray-100">
-                                                        <BuildingIcon className="size-5 text-gray-300" />
+                                                    <div className="flex h-11 w-16 items-center justify-center rounded-lg bg-[#F2EBDC]">
+                                                        <BuildingIcon className="size-5 text-[#6E675D]" />
                                                     </div>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3">
-                                                <p className="font-medium text-gray-900">
+                                                <p className="font-medium text-[#16233B]">
                                                     {partner.name}
                                                 </p>
                                             </td>
-                                            <td className="px-4 py-3 text-gray-500">
+                                            <td className="px-4 py-3 text-[#6E675D]">
                                                 {partner.sector ?? (
-                                                    <span className="text-gray-300 italic">
+                                                    <span className="text-[#6E675D]/50 italic">
                                                         —
                                                     </span>
                                                 )}
                                             </td>
-                                            <td className="px-4 py-3 text-center text-gray-600">
+                                            <td className="px-4 py-3 text-center text-[#6E675D]">
                                                 {partner.sort_order}
                                             </td>
                                             <td className="px-4 py-3 text-center">
                                                 <span
                                                     className={cn(
-                                                        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium',
+                                                        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold',
                                                         partner.is_active
-                                                            ? 'bg-green-50 text-green-700'
+                                                            ? 'bg-[#16233B] text-[#F2EBDC]'
                                                             : 'bg-gray-100 text-gray-500',
                                                     )}
                                                 >
@@ -280,7 +280,7 @@ export default function PartnersIndex({ partners }: PageProps) {
                                                         className={cn(
                                                             'size-1.5 rounded-full',
                                                             partner.is_active
-                                                                ? 'bg-green-500'
+                                                                ? 'bg-[#A88B54]'
                                                                 : 'bg-gray-400',
                                                         )}
                                                     />
@@ -296,7 +296,7 @@ export default function PartnersIndex({ partners }: PageProps) {
                                                         onClick={() =>
                                                             openEdit(partner)
                                                         }
-                                                        className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-500"
+                                                        className="rounded-lg p-1.5 text-[#6E675D] transition-colors hover:bg-[#F2EBDC] hover:text-[#16233B]"
                                                     >
                                                         <PencilIcon className="size-4" />
                                                     </button>
@@ -307,7 +307,7 @@ export default function PartnersIndex({ partners }: PageProps) {
                                                                 partner,
                                                             )
                                                         }
-                                                        className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                                                        className="rounded-lg p-1.5 text-[#6E675D] transition-colors hover:bg-red-50 hover:text-red-600"
                                                     >
                                                         <Trash2Icon className="size-4" />
                                                     </button>
@@ -324,9 +324,9 @@ export default function PartnersIndex({ partners }: PageProps) {
 
             {/* Modal tambah / edit */}
             <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-md border-[#A88B54]/40 bg-[#FAF7F0] text-[#16233B]">
                     <DialogHeader>
-                        <DialogTitle>
+                        <DialogTitle className="font-serif text-2xl font-normal text-[#16233B]">
                             {editingPartner ? 'Edit Partner' : 'Tambah Partner'}
                         </DialogTitle>
                     </DialogHeader>
@@ -459,6 +459,7 @@ export default function PartnersIndex({ partners }: PageProps) {
                             type="submit"
                             form="partner-form"
                             disabled={processing}
+                            className="rounded-full bg-[#16233B] text-[#F2EBDC] hover:bg-[#1F304F]"
                         >
                             {processing
                                 ? 'Menyimpan...'

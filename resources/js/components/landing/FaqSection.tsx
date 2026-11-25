@@ -96,7 +96,7 @@ export default function FaqSection({ content }: { content?: SectionContent }) {
                                     aria-expanded={isOpen}
                                     className="flex w-full items-center justify-between p-5 text-left sm:p-6"
                                 >
-                                    <span className="font-serif text-base font-semibold text-[#16233B] sm:text-lg">
+                                    <span className="pr-4 font-sans text-base leading-snug font-semibold text-[#16233B] md:text-lg">
                                         {faq.question}
                                     </span>
                                     <ChevronDownIcon
@@ -127,7 +127,7 @@ export default function FaqSection({ content }: { content?: SectionContent }) {
                                             }}
                                         >
                                             <div className="border-t border-[#A88B54]/25 px-5 pt-3 pb-6 sm:px-6">
-                                                <p className="font-sans text-sm leading-relaxed font-normal text-[#6E675D]">
+                                                <p className="font-sans text-sm leading-relaxed font-normal text-[#16233B]/80">
                                                     {faq.answer}
                                                 </p>
                                             </div>

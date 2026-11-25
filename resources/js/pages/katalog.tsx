@@ -1,8 +1,8 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion, MotionConfig } from 'motion/react';
 import {
-    ArrowLeftIcon,
     CheckIcon,
+    ChevronDownIcon,
     EyeIcon,
     GiftIcon,
     MinusIcon,
@@ -11,16 +11,12 @@ import {
     ShoppingBagIcon,
     SparklesIcon,
     StarIcon,
-    UserIcon,
     XIcon,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import AccountController from '@/actions/App/Http/Controllers/AccountController';
-import B2BCustomizerController from '@/actions/App/Http/Controllers/B2BCustomizerController';
 import CartController from '@/actions/App/Http/Controllers/CartController';
-import FloatingWhatsApp from '@/components/landing/FloatingWhatsApp';
-import FooterSection from '@/components/landing/FooterSection';
+import StorefrontLayout from '@/layouts/StorefrontLayout';
 import { home, login } from '@/routes';
 import type { SharedPageProps } from '@/types';
 import type { Product } from '@/types/product';
@@ -28,6 +24,7 @@ import type { Product } from '@/types/product';
 export interface KatalogPageProps {
     products?: Product[];
     categories?: string[];
+    featuredCategory?: string;
 }
 
 function formatRupiah(value: number): string {
@@ -38,48 +35,70 @@ function formatRupiah(value: number): string {
     }).format(value);
 }
 
+const SEASONAL_KEYWORDS = [
+    'seasonal',
+    'festive',
+    'ramadan',
+    'lebaran',
+    'natal',
+    'imlek',
+];
+
 export default function KatalogPage({
     products = [],
     categories: serverCategories = [],
+    featuredCategory,
 }: KatalogPageProps) {
     const items = products;
 
-    const categories = [
-        'Semua',
-        ...Array.from(
-            new Set(
-                [
-                    ...serverCategories,
-                    ...items.map((p) => p.category),
-                    ...items.map((p) => p.event_category),
-                ].filter(Boolean),
-            ),
+    const allCategoryOptions = Array.from(
+        new Set(
+            [
+                ...serverCategories,
+                ...items.map((p) => p.category),
+                ...items.map((p) => p.event_category),
+                ...items.map((p) => p.season_tag),
+            ]
+                .map((value) => (value ?? '').trim())
+                .filter((value): value is string => value !== ''),
         ),
-    ];
+    );
 
-    const seasons = [
-        'Semua',
-        ...Array.from(
-            new Set(
-                items
-                    .map((p) => p.season_tag)
-                    .filter((s): s is string => Boolean(s && s.trim() !== '')),
-            ),
-        ),
-    ];
+    const activeSeasonCategory =
+        featuredCategory && featuredCategory.trim() !== ''
+            ? featuredCategory.trim()
+            : (allCategoryOptions.find(
+                  (cat) => cat.toLowerCase() === 'seasonal & festive',
+              ) ??
+              allCategoryOptions.find((cat) =>
+                  SEASONAL_KEYWORDS.some((kw) =>
+                      cat.toLowerCase().includes(kw),
+                  ),
+              ) ??
+              'Seasonal & Festive');
 
-    const { auth, cartCount } = usePage<SharedPageProps>().props;
+    const otherCategories = allCategoryOptions.filter(
+        (cat) => cat.toLowerCase() !== activeSeasonCategory.toLowerCase(),
+    );
+
+    const { auth } = usePage<SharedPageProps>().props;
     const user = auth?.user ?? null;
 
-    const [activeCategory, setActiveCategory] = useState('Semua');
-    const [activeSeason, setActiveSeason] = useState('Semua');
+    const [activeCategory, setActiveCategory] = useState('all');
     const [onlyBestSeller, setOnlyBestSeller] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(
         null,
     );
     const [modalQuantity, setModalQuantity] = useState(1);
     const [addingProductId, setAddingProductId] = useState<number | null>(null);
+
+    const isAllActive = activeCategory === 'all' && !onlyBestSeller;
+    const isSeasonActive =
+        activeCategory.toLowerCase() === activeSeasonCategory.toLowerCase();
+    const isOtherCategoryActive = activeCategory !== 'all' && !isSeasonActive;
 
     const openDetailModal = (product: Product) => {
         setModalQuantity(1);
@@ -126,6 +145,36 @@ export default function KatalogPage({
         );
     };
 
+    // Tutup dropdown kategori saat klik di luar area dropdown atau tekan Escape
+    useEffect(() => {
+        if (!isDropdownOpen) {
+            return;
+        }
+
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        const handleEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        window.addEventListener('keydown', handleEscape);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            window.removeEventListener('keydown', handleEscape);
+        };
+    }, [isDropdownOpen]);
+
     // Kunci scroll body saat modal terbuka
     useEffect(() => {
         if (selectedProduct) {
@@ -147,21 +196,17 @@ export default function KatalogPage({
         };
     }, [selectedProduct]);
 
-    // Filter produk berdasarkan kategori/event, best-seller/season, dan pencarian
+    // Filter produk berdasarkan kategori/event/season, best-seller, dan pencarian
     const filteredProducts = items.filter((product) => {
+        const normalizedActive = activeCategory.toLowerCase();
         const matchesCategory =
-            activeCategory === 'Semua' ||
-            product.category?.toLowerCase() === activeCategory.toLowerCase() ||
-            product.event_category?.toLowerCase() ===
-                activeCategory.toLowerCase();
+            activeCategory === 'all' ||
+            product.category?.toLowerCase() === normalizedActive ||
+            product.event_category?.toLowerCase() === normalizedActive ||
+            (product.season_tag ?? '').toLowerCase() === normalizedActive;
 
         const matchesBestSeller =
             !onlyBestSeller || Boolean(product.is_best_seller);
-
-        const matchesSeason =
-            activeSeason === 'Semua' ||
-            (product.season_tag ?? '').toLowerCase() ===
-                activeSeason.toLowerCase();
 
         const matchesSearch =
             searchQuery.trim() === '' ||
@@ -170,12 +215,7 @@ export default function KatalogPage({
                 .toLowerCase()
                 .includes(searchQuery.toLowerCase());
 
-        return (
-            matchesCategory &&
-            matchesBestSeller &&
-            matchesSeason &&
-            matchesSearch
-        );
+        return matchesCategory && matchesBestSeller && matchesSearch;
     });
 
     return (
@@ -188,73 +228,11 @@ export default function KatalogPage({
                 />
             </Head>
 
-            <div className="min-h-screen bg-[#F2EBDC] font-sans text-[#16233B] antialiased selection:bg-[#A88B54]/25 selection:text-[#16233B]">
-                {/* ── Top Header Bar ────────────────────────────────────────────── */}
-                <header className="sticky top-0 z-40 border-b border-[#A88B54]/30 bg-[#16233B]/95 backdrop-blur-md">
-                    <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-6">
-                        <Link
-                            href="/"
-                            className="inline-flex items-center gap-2 font-sans text-xs font-semibold tracking-wider text-[#F2EBDC] uppercase transition-colors hover:text-[#A88B54]"
-                        >
-                            <ArrowLeftIcon className="size-4" />
-                            <span>Kembali ke Beranda</span>
-                        </Link>
-
-                        <Link
-                            href="/"
-                            aria-label="Galuh & Co. Beranda"
-                            className="flex items-center transition-opacity hover:opacity-90"
-                        >
-                            <img
-                                src="/asset/logo/Logo_galu&co.png"
-                                alt="Galuh & Co."
-                                className="h-8 w-auto object-contain sm:h-9"
-                            />
-                        </Link>
-
-                        <div className="flex items-center gap-2 sm:gap-3">
-                            <Link
-                                href={B2BCustomizerController.index()}
-                                className="hidden items-center gap-1.5 rounded-full border border-[#A88B54]/45 bg-[#A88B54]/15 px-3.5 py-2 font-sans text-xs font-semibold text-[#F2EBDC] transition-colors hover:bg-[#A88B54]/25 md:inline-flex"
-                            >
-                                <SparklesIcon className="size-3.5 text-[#A88B54]" />
-                                <span>3D Customizer</span>
-                            </Link>
-
-                            <Link
-                                href={user ? CartController.index() : login()}
-                                className="relative inline-flex items-center gap-1.5 rounded-full bg-[#F2EBDC] px-4 py-2 font-sans text-xs font-semibold text-[#16233B] transition-colors hover:bg-white"
-                            >
-                                <ShoppingBagIcon className="size-3.5" />
-                                <span className="hidden sm:inline">
-                                    Keranjang
-                                </span>
-                                {cartCount > 0 && (
-                                    <span className="inline-flex min-w-[18px] items-center justify-center rounded-full bg-[#16233B] px-1 text-[10px] font-bold text-[#F2EBDC]">
-                                        {cartCount}
-                                    </span>
-                                )}
-                            </Link>
-
-                            <Link
-                                href={
-                                    user ? AccountController.index() : login()
-                                }
-                                className="inline-flex items-center gap-1.5 rounded-full border border-[#A88B54]/40 px-3.5 py-2 font-sans text-xs font-medium text-[#F2EBDC] transition-colors hover:bg-[#F2EBDC]/10"
-                            >
-                                <UserIcon className="size-3.5 text-[#A88B54]" />
-                                <span className="hidden sm:inline">
-                                    {user ? 'Akun' : 'Masuk'}
-                                </span>
-                            </Link>
-                        </div>
-                    </div>
-                </header>
-
+            <StorefrontLayout>
                 {/* ── Main Catalog Content ──────────────────────────────────────── */}
-                <main className="mx-auto max-w-7xl px-6 py-16 md:py-20">
+                <main className="mx-auto max-w-7xl px-6 pt-28 pb-16 md:pt-32 md:pb-20">
                     {/* Header Halaman */}
-                    <div className="relative mx-auto max-w-2xl text-center">
+                    <div className="relative mx-auto max-w-3xl text-center">
                         <div
                             aria-hidden="true"
                             className="pointer-events-none absolute -top-10 left-1/2 h-56 w-80 -translate-x-1/2 rounded-full blur-2xl"
@@ -269,7 +247,7 @@ export default function KatalogPage({
                         <h1 className="relative mt-3 font-serif text-3xl leading-tight font-normal tracking-normal text-[#16233B] sm:text-4xl lg:text-5xl">
                             Seluruh Koleksi Hampers
                         </h1>
-                        <p className="relative mt-4 font-sans text-sm font-normal text-[#6E675D] sm:text-base">
+                        <p className="relative mx-auto mt-4 max-w-2xl font-sans text-sm font-normal text-[#6E675D] sm:text-base">
                             Jelajahi setiap bingkisan mewah yang dirancang
                             dengan keanggunan, rasa kurasi artisan, dan sentuhan
                             personal tanpa batas.
@@ -301,45 +279,54 @@ export default function KatalogPage({
                             </div>
                         )}
 
-                        {/* Filter Kategori / Event Dinamis */}
-                        {categories.length > 1 && (
-                            <div className="relative mt-6 flex flex-wrap items-center justify-center gap-2">
-                                {categories.map((category) => {
-                                    const isActive =
-                                        activeCategory.toLowerCase() ===
-                                        category.toLowerCase();
-                                    return (
-                                        <button
-                                            key={category}
-                                            type="button"
-                                            onClick={() =>
-                                                setActiveCategory(category)
-                                            }
-                                            className={`rounded-full px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
-                                                isActive
-                                                    ? 'bg-[#16233B] text-[#F2EBDC] shadow-sm'
-                                                    : 'border border-[#A88B54]/30 bg-[#FAF7F0] text-[#6E675D] shadow-[0_2px_8px_-2px_rgba(22,35,59,0.06)] hover:border-[#16233B] hover:text-[#16233B]'
-                                            }`}
-                                        >
-                                            {category}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        )}
-
-                        {/* Filter Best Selling per Season */}
+                        {/* Bar Filter 1 Baris Ringkas */}
                         {items.length > 0 && (
-                            <div className="relative mt-4 flex flex-wrap items-center justify-center gap-2">
+                            <div className="relative mt-5 flex flex-wrap items-center justify-center gap-2.5">
+                                {/* 1) Semua */}
                                 <button
                                     type="button"
-                                    onClick={() =>
-                                        setOnlyBestSeller((prev) => !prev)
-                                    }
-                                    className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 font-sans text-xs font-semibold transition-all duration-300 ${
+                                    onClick={() => {
+                                        setActiveCategory('all');
+                                        setOnlyBestSeller(false);
+                                        setIsDropdownOpen(false);
+                                    }}
+                                    className={`inline-flex items-center rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
+                                        isAllActive
+                                            ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-sm'
+                                            : 'border-[#16233B]/15 bg-white text-[#16233B] hover:border-[#A88B54]'
+                                    }`}
+                                >
+                                    Semua
+                                </button>
+
+                                {/* 2) Season Berlangsung */}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setActiveCategory(activeSeasonCategory);
+                                        setIsDropdownOpen(false);
+                                    }}
+                                    className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
+                                        isSeasonActive
+                                            ? 'border-[#A88B54]/60 bg-[#16233B] text-[#F2EBDC] shadow-sm'
+                                            : 'border-[#A88B54]/50 bg-[#FAF7F0] text-[#16233B] hover:border-[#A88B54] hover:bg-[#A88B54]/10'
+                                    }`}
+                                >
+                                    <SparklesIcon className="size-3.5 text-[#A88B54]" />
+                                    {activeSeasonCategory}
+                                </button>
+
+                                {/* 3) ★ Best Seller */}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setOnlyBestSeller((prev) => !prev);
+                                        setIsDropdownOpen(false);
+                                    }}
+                                    className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
                                         onlyBestSeller
-                                            ? 'bg-[#16233B] text-[#F2EBDC] shadow-sm'
-                                            : 'border border-[#A88B54]/30 bg-[#FAF7F0] text-[#16233B] hover:border-[#16233B]'
+                                            ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-sm'
+                                            : 'border-[#16233B]/15 bg-white text-[#16233B] hover:border-[#A88B54]'
                                     }`}
                                 >
                                     <StarIcon
@@ -352,33 +339,121 @@ export default function KatalogPage({
                                     Best Seller
                                 </button>
 
-                                {seasons.length > 1 &&
-                                    seasons.map((season) => {
-                                        const isSeasonActive =
-                                            activeSeason.toLowerCase() ===
-                                            season.toLowerCase();
-                                        return (
-                                            <button
-                                                key={season}
-                                                type="button"
-                                                onClick={() =>
-                                                    setActiveSeason(season)
-                                                }
-                                                className={`inline-flex items-center gap-1 rounded-full px-3.5 py-1.5 font-sans text-xs font-medium transition-all duration-300 ${
-                                                    isSeasonActive
-                                                        ? 'bg-[#1E2F4D] text-[#F2EBDC] shadow-xs'
-                                                        : 'border border-[#A88B54]/25 bg-[#FAF7F0] text-[#6E675D] hover:border-[#16233B] hover:text-[#16233B]'
-                                                }`}
+                                {/* 4) Dropdown Kategori Lainnya */}
+                                <div ref={dropdownRef} className="relative">
+                                    <button
+                                        type="button"
+                                        aria-expanded={isDropdownOpen}
+                                        aria-haspopup="listbox"
+                                        onClick={() =>
+                                            setIsDropdownOpen((prev) => !prev)
+                                        }
+                                        className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
+                                            isOtherCategoryActive
+                                                ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-sm'
+                                                : 'border-[#16233B]/15 bg-white text-[#16233B] hover:border-[#A88B54]'
+                                        }`}
+                                    >
+                                        <span>
+                                            {isOtherCategoryActive
+                                                ? activeCategory
+                                                : 'Kategori Lainnya'}
+                                        </span>
+                                        <ChevronDownIcon
+                                            className={`size-3.5 transition-transform duration-200 ${
+                                                isDropdownOpen
+                                                    ? 'rotate-180'
+                                                    : ''
+                                            } ${
+                                                isOtherCategoryActive
+                                                    ? 'text-[#A88B54]'
+                                                    : 'text-[#6E675D]'
+                                            }`}
+                                        />
+                                    </button>
+
+                                    <AnimatePresence>
+                                        {isDropdownOpen && (
+                                            <motion.div
+                                                role="listbox"
+                                                aria-label="Pilih kategori lainnya"
+                                                initial={{
+                                                    opacity: 0,
+                                                    y: -6,
+                                                    scale: 0.98,
+                                                }}
+                                                animate={{
+                                                    opacity: 1,
+                                                    y: 0,
+                                                    scale: 1,
+                                                }}
+                                                exit={{
+                                                    opacity: 0,
+                                                    y: -6,
+                                                    scale: 0.98,
+                                                }}
+                                                transition={{
+                                                    duration: 0.18,
+                                                    ease: [
+                                                        0.16, 1, 0.3, 1,
+                                                    ] as const,
+                                                }}
+                                                className="absolute top-full left-1/2 z-30 mt-2 min-w-[230px] -translate-x-1/2 rounded-2xl border border-[#16233B]/15 bg-white p-2 text-left shadow-xl"
                                             >
-                                                {season !== 'Semua' && (
-                                                    <SparklesIcon className="size-3 text-[#A88B54]" />
+                                                {otherCategories.length > 0 ? (
+                                                    <div className="space-y-1">
+                                                        {otherCategories.map(
+                                                            (category) => {
+                                                                const isSelected =
+                                                                    activeCategory.toLowerCase() ===
+                                                                    category.toLowerCase();
+                                                                return (
+                                                                    <button
+                                                                        key={
+                                                                            category
+                                                                        }
+                                                                        type="button"
+                                                                        role="option"
+                                                                        aria-selected={
+                                                                            isSelected
+                                                                        }
+                                                                        onClick={() => {
+                                                                            setActiveCategory(
+                                                                                category,
+                                                                            );
+                                                                            setIsDropdownOpen(
+                                                                                false,
+                                                                            );
+                                                                        }}
+                                                                        className={`flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left font-sans text-xs font-medium transition-colors ${
+                                                                            isSelected
+                                                                                ? 'bg-[#16233B] text-[#F2EBDC]'
+                                                                                : 'text-[#16233B] hover:bg-[#F2EBDC]'
+                                                                        }`}
+                                                                    >
+                                                                        <span>
+                                                                            {
+                                                                                category
+                                                                            }
+                                                                        </span>
+                                                                        {isSelected && (
+                                                                            <CheckIcon className="size-3.5 shrink-0 text-[#A88B54]" />
+                                                                        )}
+                                                                    </button>
+                                                                );
+                                                            },
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <p className="px-3 py-2 font-sans text-xs text-[#6E675D]">
+                                                        Belum ada kategori
+                                                        lainnya.
+                                                    </p>
                                                 )}
-                                                {season === 'Semua'
-                                                    ? 'Semua Season'
-                                                    : season}
-                                            </button>
-                                        );
-                                    })}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -446,9 +521,9 @@ export default function KatalogPage({
                                 type="button"
                                 onClick={() => {
                                     setSearchQuery('');
-                                    setActiveCategory('Semua');
-                                    setActiveSeason('Semua');
+                                    setActiveCategory('all');
                                     setOnlyBestSeller(false);
+                                    setIsDropdownOpen(false);
                                 }}
                                 className="mt-6 inline-flex rounded-full bg-[#16233B] px-6 py-2.5 font-sans text-xs font-semibold text-[#F2EBDC] transition-colors hover:bg-[#1F304F]"
                             >
@@ -655,7 +730,7 @@ export default function KatalogPage({
                                         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent md:hidden" />
                                     </div>
 
-                                    <div className="flex max-h-[75vh] flex-col justify-between overflow-y-auto p-6 md:max-h-[580px] md:p-8">
+                                    <div className="no-scrollbar flex max-h-[75vh] flex-col justify-between overflow-y-auto p-6 md:max-h-[580px] md:p-8">
                                         <div>
                                             <span className="inline-block rounded-full border border-[#A88B54]/45 bg-[#A88B54]/15 px-3 py-1 font-sans text-[10px] font-semibold tracking-wider text-[#16233B] uppercase">
                                                 {selectedProduct.category}
@@ -777,11 +852,7 @@ export default function KatalogPage({
                         </div>
                     )}
                 </AnimatePresence>
-
-                {/* ── Footer & Floating WhatsApp ────────────────────────────────── */}
-                <FooterSection />
-                <FloatingWhatsApp />
-            </div>
+            </StorefrontLayout>
         </MotionConfig>
     );
 }

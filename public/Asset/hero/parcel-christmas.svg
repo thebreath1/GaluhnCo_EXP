@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 580" fill="none">
+  <defs>
+    <linearGradient id="xmasNavy" x1="120" y1="220" x2="520" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1E3532"/>
+      <stop offset="55%" stop-color="#16233B"/>
+      <stop offset="100%" stop-color="#0D1524"/>
+    </linearGradient>
+    <linearGradient id="xmasBrass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#EAD29E"/>
+      <stop offset="50%" stop-color="#A88B54"/>
+      <stop offset="100%" stop-color="#7B6232"/>
+    </linearGradient>
+    <linearGradient id="xmasIvory" x1="150" y1="180" x2="520" y2="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FAF7F0"/>
+      <stop offset="100%" stop-color="#E7DEC9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Lid Behind -->
+  <g transform="rotate(-10 190 220)">
+    <rect x="94" y="116" width="226" height="186" rx="14" fill="url(#xmasNavy)" stroke="#A88B54" stroke-width="2.5"/>
+    <rect x="110" y="132" width="194" height="154" rx="8" stroke="#A88B54" stroke-opacity="0.45" stroke-width="1.2"/>
+    <path d="M207,156 L192,190 L222,190 Z M207,178 L184,218 L230,218 Z M207,204 L176,246 L238,246 Z" fill="url(#xmasBrass)" fill-opacity="0.9"/>
+    <rect x="202" y="246" width="10" height="16" fill="#A88B54"/>
+  </g>
+
+  <!-- Box Ivory Interior -->
+  <polygon points="145,282 392,196 546,256 306,348" fill="url(#xmasIvory)" stroke="#A88B54" stroke-width="2"/>
+
+  <!-- Pine Sprig Accents -->
+  <g stroke="#2B5242" stroke-width="3" stroke-linecap="round">
+    <path d="M168,268 Q195,235 225,220"/>
+    <path d="M188,245 L176,228 M198,236 L190,218 M208,229 L204,212"/>
+    <path d="M462,250 Q488,220 508,200"/>
+    <path d="M480,230 L495,228 M492,217 L508,215"/>
+  </g>
+
+  <!-- Gourmet Items -->
+  <g transform="translate(212,170)">
+    <path d="M10,30 L10,110 A35,12 0 0,0 80,110 L80,30 Z" fill="#FAF7F0" stroke="#A88B54" stroke-width="1.6"/>
+    <ellipse cx="45" cy="30" rx="35" ry="11" fill="url(#xmasBrass)"/>
+    <rect x="24" y="54" width="42" height="30" rx="4" fill="#16233B"/>
+  </g>
+  <g transform="translate(300,136)">
+    <path d="M10,28 L10,120 A36,12 0 0,0 82,120 L82,28 Z" fill="#16233B" stroke="#A88B54" stroke-width="1.6"/>
+    <ellipse cx="46" cy="28" rx="36" ry="12" fill="#23375A" stroke="#EAD29E" stroke-width="1.4"/>
+    <circle cx="46" cy="76" r="14" fill="url(#xmasBrass)"/>
+  </g>
+  <g transform="translate(384,186)">
+    <path d="M12,28 L12,98 A28,10 0 0,0 68,98 L68,28 Z" fill="#C98A32" fill-opacity="0.88" stroke="#FAF7F0" stroke-width="1.4"/>
+    <ellipse cx="40" cy="26" rx="29" ry="9" fill="url(#xmasBrass)"/>
+  </g>
+
+  <!-- Front & Side Walls -->
+  <polygon points="145,282 306,348 306,496 145,424" fill="url(#xmasNavy)" stroke="#A88B54" stroke-width="2"/>
+  <polygon points="306,348 546,256 546,404 306,496" fill="#1A2B45" stroke="#A88B54" stroke-width="2"/>
+
+  <polygon points="212,309 238,320 238,465 212,453" fill="url(#xmasBrass)"/>
+  <polygon points="416,306 442,296 442,444 416,454" fill="url(#xmasBrass)"/>
+
+  <!-- Brass Bow & Festive Bell -->
+  <g transform="translate(306,348)">
+    <path d="M0,0 C-46,-34 -72,-2 -28,15 C-12,21 -4,10 0,0 Z" fill="url(#xmasBrass)" stroke="#FAF7F0" stroke-opacity="0.55"/>
+    <path d="M0,0 C46,-34 72,-2 28,15 C12,21 4,10 0,0 Z" fill="url(#xmasBrass)" stroke="#FAF7F0" stroke-opacity="0.55"/>
+    <circle cx="0" cy="4" r="10" fill="#EAD29E" stroke="#7B6232" stroke-width="1.2"/>
+    <circle cx="-8" cy="36" r="11" fill="url(#xmasBrass)" stroke="#FAF7F0" stroke-width="1"/>
+    <circle cx="10" cy="44" r="9" fill="#EAD29E" stroke="#7B6232" stroke-width="1"/>
+  </g>
+
+  <rect x="355" y="346" width="146" height="58" rx="8" transform="skewY(-20)" fill="#FAF7F0" stroke="#A88B54" stroke-width="1.6"/>
+  <text x="428" y="374" text-anchor="middle" transform="skewY(-20)" font-family="Georgia, serif" font-size="13" font-style="italic" fill="#A88B54">Season's Greetings</text>
+  <text x="428" y="392" text-anchor="middle" transform="skewY(-20)" font-family="Georgia, serif" font-size="14" font-weight="600" fill="#16233B" letter-spacing="1.8">GALUH &amp; CO.</text>
+</svg>

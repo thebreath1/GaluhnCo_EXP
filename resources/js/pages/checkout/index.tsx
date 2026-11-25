@@ -5,6 +5,7 @@ import {
     CheckCircle2Icon,
     CreditCardIcon,
     FileTextIcon,
+    LockIcon,
     MapPinIcon,
     PlusIcon,
     SparklesIcon,
@@ -17,7 +18,6 @@ import AccountController from '@/actions/App/Http/Controllers/AccountController'
 import CartController from '@/actions/App/Http/Controllers/CartController';
 import CheckoutController from '@/actions/App/Http/Controllers/CheckoutController';
 import type { StoredParcelItem } from '@/components/b2b/parcel-catalog';
-import FooterSection from '@/components/landing/FooterSection';
 import { Spinner } from '@/components/ui/spinner';
 import { home } from '@/routes';
 
@@ -146,9 +146,9 @@ export default function CheckoutIndex({
             <Head title="Checkout Pesanan — Galuh & Co." />
 
             <div className="min-h-screen bg-[#F2EBDC] font-sans text-[#16233B] antialiased selection:bg-[#A88B54]/25 selection:text-[#16233B]">
-                {/* Sticky Header */}
+                {/* Minimal Distraction-Free Checkout Header */}
                 <header className="sticky top-0 z-40 border-b border-[#A88B54]/30 bg-[#16233B]/95 backdrop-blur-md">
-                    <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-6">
+                    <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-4 px-6">
                         <Link
                             href={CartController.index()}
                             className="inline-flex items-center gap-2 font-sans text-xs font-semibold tracking-wider text-[#F2EBDC] uppercase transition-colors hover:text-[#A88B54]"
@@ -157,7 +157,11 @@ export default function CheckoutIndex({
                             <span>Kembali ke Keranjang</span>
                         </Link>
 
-                        <Link href={home()} className="flex items-center">
+                        <Link
+                            href={home()}
+                            aria-label="Galuh & Co. Beranda"
+                            className="flex items-center transition-opacity hover:opacity-90"
+                        >
                             <img
                                 src="/asset/logo/Logo_galu&co.png"
                                 alt="Galuh & Co."
@@ -165,8 +169,12 @@ export default function CheckoutIndex({
                             />
                         </Link>
 
-                        <span className="hidden rounded-full border border-[#A88B54]/40 bg-[#1E2F4D] px-3.5 py-1.5 font-sans text-[11px] font-semibold tracking-wider text-[#F2EBDC] uppercase sm:inline-flex">
-                            Checkout Aman
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-[#A88B54]/45 bg-[#1E2F4D] px-3.5 py-1.5 font-sans text-[11px] font-semibold tracking-wider text-[#F2EBDC] uppercase">
+                            <LockIcon className="size-3.5 text-[#A88B54]" />
+                            <span className="hidden sm:inline">
+                                SECURE CHECKOUT
+                            </span>
+                            <span className="sm:hidden">SECURE</span>
                         </span>
                     </div>
                 </header>
@@ -562,8 +570,6 @@ export default function CheckoutIndex({
                         </aside>
                     </form>
                 </main>
-
-                <FooterSection />
             </div>
         </>
     );

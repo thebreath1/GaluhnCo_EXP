@@ -108,80 +108,86 @@ export default function InquiryIndex({ inquiries }: PageProps) {
         <>
             <Head title="Manajemen Inquiry" />
 
-            <div className="space-y-5 p-6">
+            <div className="space-y-6 p-6 sm:p-8">
                 {/* Page title */}
-                <h1 className="text-xl font-bold text-gray-900">
-                    Daftar Inquiry
-                </h1>
+                <div className="border-b border-[#A88B54]/20 pb-5">
+                    <h1 className="font-serif text-2xl font-normal text-[#16233B] sm:text-3xl">
+                        Daftar Inquiry Corporate
+                    </h1>
+                    <p className="mt-0.5 font-sans text-xs text-[#6E675D] sm:text-sm">
+                        Kelola permintaan penawaran korporat dan status tindak
+                        lanjutnya.
+                    </p>
+                </div>
 
                 {/* Summary cards */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                     <SummaryCard
                         label="Inquiry Baru"
                         count={countByStatus('new')}
-                        bg="bg-emerald-800"
+                        variant="navy"
                     />
                     <SummaryCard
                         label="Dihubungi"
                         count={countByStatus('contacted')}
-                        bg="bg-amber-500"
+                        variant="softNavy"
                     />
                     <SummaryCard
                         label="Selesai"
                         count={countByStatus('closed')}
-                        bg="bg-stone-500"
+                        variant="ivory"
                     />
                 </div>
 
                 {/* Toolbar */}
                 <div className="flex items-center gap-3">
-                    <div className="flex max-w-xs flex-1 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm">
-                        <SearchIcon className="size-4 shrink-0 text-gray-400" />
+                    <div className="flex max-w-xs flex-1 items-center gap-2 rounded-xl border border-[#A88B54]/30 bg-white px-3.5 py-2 text-sm shadow-xs">
+                        <SearchIcon className="size-4 shrink-0 text-[#A88B54]" />
                         <input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Cari nama, perusahaan..."
-                            className="flex-1 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
+                            className="flex-1 bg-transparent font-sans text-sm text-[#16233B] outline-none placeholder:text-[#6E675D]/70"
                         />
                     </div>
-                    <span className="ml-1 text-xs text-gray-400">
+                    <span className="ml-1 font-sans text-xs font-medium text-[#6E675D]">
                         {filtered.length} inquiry
                     </span>
                 </div>
 
                 {/* Table */}
-                <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+                <div className="overflow-hidden rounded-2xl border border-[#A88B54]/25 bg-white shadow-xs">
                     <div className="overflow-x-auto">
                         <table className="min-w-full text-sm">
                             <thead>
-                                <tr className="border-b border-gray-100 bg-gray-50/60">
-                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                <tr className="border-b border-[#A88B54]/20 bg-[#F2EBDC]/60">
+                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Nama / Perusahaan
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Kontak
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Jml Paket
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Budget
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Tgl Butuh
                                     </th>
-                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Status
                                     </th>
                                     <th className="px-4 py-3" />
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-[#A88B54]/15">
                                 {filtered.length === 0 ? (
                                     <tr>
                                         <td
                                             colSpan={7}
-                                            className="py-12 text-center text-sm text-gray-400"
+                                            className="py-12 text-center font-sans text-sm text-[#6E675D]"
                                         >
                                             {search
                                                 ? 'Tidak ada hasil yang cocok.'
@@ -192,7 +198,7 @@ export default function InquiryIndex({ inquiries }: PageProps) {
                                     filtered.map((inquiry) => (
                                         <tr
                                             key={inquiry.id}
-                                            className="transition-colors hover:bg-gray-50/60"
+                                            className="transition-colors hover:bg-[#FAF7F0]"
                                         >
                                             <td className="px-4 py-3.5">
                                                 <button
@@ -368,16 +374,35 @@ export default function InquiryIndex({ inquiries }: PageProps) {
 function SummaryCard({
     label,
     count,
-    bg,
+    variant,
 }: {
     label: string;
     count: number;
-    bg: string;
+    variant: 'navy' | 'softNavy' | 'ivory';
 }) {
+    const styleClass =
+        variant === 'navy'
+            ? 'border-[#A88B54]/40 bg-[#16233B] text-[#F2EBDC]'
+            : variant === 'softNavy'
+              ? 'border-[#A88B54]/35 bg-[#1E2F4D] text-[#F2EBDC]'
+              : 'border-[#A88B54]/25 bg-white text-[#16233B]';
+
+    const labelClass =
+        variant === 'ivory' ? 'text-[#6E675D]' : 'text-[#F2EBDC]/80';
+
     return (
-        <div className={cn('rounded-2xl px-5 py-4 text-white shadow-sm', bg)}>
-            <p className="text-xs font-medium opacity-80">{label}</p>
-            <p className="mt-1 text-3xl font-bold">{count}</p>
+        <div
+            className={cn('rounded-2xl border px-5 py-4 shadow-xs', styleClass)}
+        >
+            <p
+                className={cn(
+                    'font-sans text-xs font-semibold tracking-wider uppercase',
+                    labelClass,
+                )}
+            >
+                {label}
+            </p>
+            <p className="mt-1 font-serif text-3xl font-semibold">{count}</p>
         </div>
     );
 }

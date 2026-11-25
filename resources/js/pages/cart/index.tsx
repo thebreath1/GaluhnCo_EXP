@@ -1,6 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
-    ArrowLeftIcon,
     ArrowRightIcon,
     GiftIcon,
     MinusIcon,
@@ -8,17 +7,15 @@ import {
     ShoppingBagIcon,
     SparklesIcon,
     Trash2Icon,
-    UserIcon,
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import AccountController from '@/actions/App/Http/Controllers/AccountController';
 import B2BCustomizerController from '@/actions/App/Http/Controllers/B2BCustomizerController';
 import CartController from '@/actions/App/Http/Controllers/CartController';
 import CheckoutController from '@/actions/App/Http/Controllers/CheckoutController';
 import type { StoredParcelItem } from '@/components/b2b/parcel-catalog';
-import FooterSection from '@/components/landing/FooterSection';
-import { catalog, home } from '@/routes';
+import StorefrontLayout from '@/layouts/StorefrontLayout';
+import { catalog } from '@/routes';
 import type { SharedPageProps } from '@/types';
 
 interface CustomConfig {
@@ -105,64 +102,8 @@ export default function CartIndex({ items = [] }: { items?: CartItemEntry[] }) {
         <>
             <Head title="Keranjang Belanja — Galuh & Co." />
 
-            <div className="min-h-screen bg-[#F2EBDC] font-sans text-[#16233B] antialiased selection:bg-[#A88B54]/25 selection:text-[#16233B]">
-                {/* Sticky Deep Navy Header */}
-                <header className="sticky top-0 z-40 border-b border-[#A88B54]/30 bg-[#16233B]/95 backdrop-blur-md">
-                    <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between gap-4 px-6">
-                        <div className="flex items-center gap-4">
-                            <Link
-                                href={home()}
-                                className="inline-flex items-center gap-2 font-sans text-xs font-semibold tracking-wider text-[#F2EBDC] uppercase transition-colors hover:text-[#A88B54]"
-                            >
-                                <ArrowLeftIcon className="size-4" />
-                                <span className="hidden sm:inline">
-                                    Beranda
-                                </span>
-                            </Link>
-                            <span
-                                className="hidden h-4 w-px bg-[#A88B54]/30 sm:inline-block"
-                                aria-hidden="true"
-                            />
-                            <Link
-                                href={catalog()}
-                                className="hidden font-sans text-xs font-medium tracking-wider text-[#F2EBDC]/85 uppercase transition-colors hover:text-[#A88B54] sm:inline"
-                            >
-                                Katalog
-                            </Link>
-                        </div>
-
-                        <Link
-                            href={home()}
-                            aria-label="Galuh & Co. Beranda"
-                            className="flex items-center transition-opacity hover:opacity-90"
-                        >
-                            <img
-                                src="/asset/logo/Logo_galu&co.png"
-                                alt="Galuh & Co."
-                                className="h-8 w-auto object-contain sm:h-9"
-                            />
-                        </Link>
-
-                        <div className="flex items-center gap-2 sm:gap-3">
-                            <Link
-                                href={B2BCustomizerController.index()}
-                                className="hidden items-center gap-1.5 rounded-full border border-[#A88B54]/45 bg-[#A88B54]/15 px-3.5 py-2 font-sans text-xs font-semibold text-[#F2EBDC] transition-colors hover:bg-[#A88B54]/25 md:inline-flex"
-                            >
-                                <SparklesIcon className="size-3.5 text-[#A88B54]" />
-                                <span>3D Customizer</span>
-                            </Link>
-                            <Link
-                                href={AccountController.index()}
-                                className="inline-flex items-center gap-1.5 rounded-full border border-[#A88B54]/40 px-4 py-2 font-sans text-xs font-medium text-[#F2EBDC] transition-colors hover:bg-[#F2EBDC]/10"
-                            >
-                                <UserIcon className="size-3.5 text-[#A88B54]" />
-                                <span>Akun Saya</span>
-                            </Link>
-                        </div>
-                    </div>
-                </header>
-
-                <main className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+            <StorefrontLayout>
+                <main className="mx-auto max-w-7xl px-6 pt-28 pb-16 md:pt-32 md:pb-20">
                     <div className="mb-8">
                         <span className="font-sans text-xs font-semibold tracking-[0.24em] text-[#6E675D] uppercase">
                             Ringkasan Bingkisan
@@ -396,7 +337,7 @@ export default function CartIndex({ items = [] }: { items?: CartItemEntry[] }) {
                             </div>
 
                             {/* Summary Card */}
-                            <aside className="rounded-3xl border border-[#A88B54]/30 bg-[#FAF7F0] p-6 shadow-[0_14px_34px_-12px_rgba(22,35,59,0.12)] sm:p-8 lg:sticky lg:top-24 lg:col-span-4">
+                            <aside className="rounded-3xl border border-[#A88B54]/30 bg-[#FAF7F0] p-6 shadow-[0_14px_34px_-12px_rgba(22,35,59,0.12)] sm:p-8 lg:sticky lg:top-28 lg:col-span-4">
                                 <h2 className="font-serif text-2xl font-normal text-[#16233B]">
                                     Ringkasan Belanja
                                 </h2>
@@ -441,9 +382,7 @@ export default function CartIndex({ items = [] }: { items?: CartItemEntry[] }) {
                         </div>
                     )}
                 </main>
-
-                <FooterSection />
-            </div>
+            </StorefrontLayout>
         </>
     );
 }

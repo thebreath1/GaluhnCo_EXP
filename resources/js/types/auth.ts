@@ -17,6 +17,12 @@ export type Auth = {
     user: User;
 };
 
+export type SeasonalRibbonProps = {
+    active: boolean;
+    text: string;
+    link: string;
+};
+
 export type SharedPageProps = {
     name: string;
     auth: {
@@ -25,4 +31,10 @@ export type SharedPageProps = {
     cartCount: number;
     sidebarOpen: boolean;
     whatsapp_number?: string | null;
+    seasonalRibbon?: SeasonalRibbonProps;
+    flash?: {
+        error?: string | null;
+        success?: string | null;
+    };
+    errors?: Record<string, string>;
 };

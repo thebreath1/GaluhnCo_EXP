@@ -1,6 +1,5 @@
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import {
-    ArrowLeftIcon,
     Building2Icon,
     CheckCircle2Icon,
     CheckIcon,
@@ -15,8 +14,6 @@ import {
     PlusIcon,
     QrCodeIcon,
     ShieldCheckIcon,
-    ShoppingBagIcon,
-    SparklesIcon,
     Trash2Icon,
     TruckIcon,
     UserIcon,
@@ -25,7 +22,6 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import AccountController from '@/actions/App/Http/Controllers/AccountController';
 import type { StoredParcelItem } from '@/components/b2b/parcel-catalog';
-import FooterSection from '@/components/landing/FooterSection';
 import QrCodeSvg from '@/components/QrCodeSvg';
 import {
     Dialog,
@@ -35,8 +31,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
-import { catalog, dashboard, home, logout } from '@/routes';
-import type { SharedPageProps } from '@/types';
+import StorefrontLayout from '@/layouts/StorefrontLayout';
+import { catalog, dashboard, logout } from '@/routes';
 
 type AccountTab = 'profile' | 'addresses' | 'orders';
 
@@ -175,7 +171,6 @@ export default function AccountIndex({
     addresses,
     orders,
 }: AccountPageProps) {
-    const { cartCount } = usePage<SharedPageProps>().props;
     const [activeTab, setActiveTab] = useState<AccountTab>('profile');
 
     // ── Profile Form ──────────────────────────────────────────────────────────
@@ -333,92 +328,10 @@ export default function AccountIndex({
         <>
             <Head title="Akun Saya — Galuh & Co." />
 
-            <div className="min-h-screen bg-[#F2EBDC] font-sans text-[#16233B] antialiased selection:bg-[#A88B54]/25 selection:text-[#16233B]">
-                {/* ── Sticky Top Header Bar ───────────────────────────────────── */}
-                <header className="sticky top-0 z-40 border-b border-[#A88B54]/30 bg-[#16233B]/95 backdrop-blur-md">
-                    <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between gap-4 px-6">
-                        <div className="flex items-center gap-4">
-                            <Link
-                                href={home()}
-                                className="inline-flex items-center gap-2 font-sans text-xs font-semibold tracking-wider text-[#F2EBDC] uppercase transition-colors hover:text-[#A88B54]"
-                            >
-                                <ArrowLeftIcon className="size-4" />
-                                <span className="hidden sm:inline">
-                                    Beranda
-                                </span>
-                            </Link>
-                            <span
-                                className="hidden h-4 w-px bg-[#A88B54]/30 sm:inline-block"
-                                aria-hidden="true"
-                            />
-                            <Link
-                                href={catalog()}
-                                className="hidden font-sans text-xs font-medium tracking-wider text-[#F2EBDC]/85 uppercase transition-colors hover:text-[#A88B54] sm:inline"
-                            >
-                                Katalog
-                            </Link>
-                        </div>
-
-                        <Link
-                            href={home()}
-                            aria-label="Galuh & Co. Beranda"
-                            className="flex items-center transition-opacity hover:opacity-90"
-                        >
-                            <img
-                                src="/asset/logo/Logo_galu&co.png"
-                                alt="Galuh & Co."
-                                className="h-8 w-auto object-contain sm:h-9"
-                            />
-                        </Link>
-
-                        <div className="flex items-center gap-2 sm:gap-3">
-                            <Link
-                                href="/b2b/customizer"
-                                className="hidden items-center gap-1.5 rounded-full border border-[#A88B54]/50 bg-[#A88B54]/15 px-3.5 py-2 font-sans text-xs font-semibold text-[#F2EBDC] transition-colors hover:bg-[#A88B54]/25 md:inline-flex"
-                            >
-                                <SparklesIcon className="size-3.5 text-[#A88B54]" />
-                                <span>3D Customizer</span>
-                            </Link>
-
-                            {user.is_admin && (
-                                <Link
-                                    href={dashboard()}
-                                    className="hidden items-center gap-1.5 rounded-full border border-[#F2EBDC]/30 px-3.5 py-2 font-sans text-xs font-medium text-[#F2EBDC] transition-colors hover:bg-[#F2EBDC]/10 md:inline-flex"
-                                >
-                                    Admin Panel
-                                </Link>
-                            )}
-
-                            <Link
-                                href="/cart"
-                                className="relative inline-flex items-center gap-1.5 rounded-full bg-[#F2EBDC] px-3.5 py-2 font-sans text-xs font-semibold text-[#16233B] transition-colors hover:bg-white"
-                            >
-                                <ShoppingBagIcon className="size-3.5 text-[#16233B]" />
-                                <span className="hidden sm:inline">
-                                    Keranjang
-                                </span>
-                                {cartCount > 0 && (
-                                    <span className="inline-flex size-4.5 items-center justify-center rounded-full bg-[#16233B] font-sans text-[10px] font-bold text-[#F2EBDC]">
-                                        {cartCount}
-                                    </span>
-                                )}
-                            </Link>
-
-                            <button
-                                type="button"
-                                onClick={handleLogout}
-                                title="Keluar"
-                                className="inline-flex size-9 items-center justify-center rounded-full border border-[#A88B54]/35 text-[#F2EBDC] transition-colors hover:bg-[#F2EBDC]/10"
-                            >
-                                <LogOutIcon className="size-4" />
-                            </button>
-                        </div>
-                    </div>
-                </header>
-
+            <StorefrontLayout>
                 {/* ── Account Summary Banner (Deep Navy) ──────────────────────── */}
-                <section className="border-b border-[#A88B54]/30 bg-[#16233B] text-[#F2EBDC]">
-                    <div className="mx-auto max-w-7xl px-6 py-10 md:py-12">
+                <section className="border-b border-[#A88B54]/30 bg-[#16233B] pt-28 pb-10 text-[#F2EBDC] md:pt-32 md:pb-12">
+                    <div className="mx-auto max-w-7xl px-6">
                         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
                             <div>
                                 <div className="inline-flex items-center gap-2 rounded-full border border-[#A88B54]/45 bg-[#1E2F4D] px-3.5 py-1">
@@ -447,8 +360,8 @@ export default function AccountIndex({
                                 </p>
                             </div>
 
-                            {/* Stat pills */}
-                            <div className="flex flex-wrap gap-3">
+                            {/* Stat pills & Account actions */}
+                            <div className="flex flex-wrap items-center gap-3">
                                 <div className="rounded-2xl border border-[#A88B54]/30 bg-[#1E2F4D] px-4 py-2.5">
                                     <p className="font-sans text-[10px] font-semibold tracking-wider text-[#F2EBDC]/75 uppercase">
                                         Alamat Tersimpan
@@ -465,6 +378,22 @@ export default function AccountIndex({
                                         {orders.length}
                                     </p>
                                 </div>
+                                {user.is_admin && (
+                                    <Link
+                                        href={dashboard()}
+                                        className="inline-flex items-center gap-1.5 rounded-full border border-[#F2EBDC]/30 px-4 py-2.5 font-sans text-xs font-medium text-[#F2EBDC] transition-colors hover:bg-[#F2EBDC]/10"
+                                    >
+                                        Admin Panel
+                                    </Link>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={handleLogout}
+                                    className="inline-flex items-center gap-1.5 rounded-full border border-[#A88B54]/45 bg-[#1E2F4D] px-4 py-2.5 font-sans text-xs font-semibold text-[#F2EBDC] transition-colors hover:bg-[#F2EBDC]/10"
+                                >
+                                    <LogOutIcon className="size-3.5 text-[#A88B54]" />
+                                    <span>Keluar</span>
+                                </button>
                             </div>
                         </div>
 
@@ -1291,9 +1220,7 @@ export default function AccountIndex({
                         </div>
                     )}
                 </main>
-
-                <FooterSection />
-            </div>
+            </StorefrontLayout>
 
             {/* ── Modal Tambah / Edit Alamat ─────────────────────────────────── */}
             <Dialog open={addressModalOpen} onOpenChange={setAddressModalOpen}>

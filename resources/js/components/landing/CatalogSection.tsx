@@ -2,6 +2,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'motion/react';
 import {
     CheckIcon,
+    ChevronDownIcon,
     EyeIcon,
     GiftIcon,
     MinusIcon,
@@ -11,7 +12,7 @@ import {
     StarIcon,
     XIcon,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import CartController from '@/actions/App/Http/Controllers/CartController';
 import { getCmsText, type SectionContent } from '@/components/landing/cms';
@@ -22,6 +23,7 @@ import type { Product } from '@/types/product';
 interface CatalogSectionProps {
     products?: Product[];
     categories?: string[];
+    featuredCategory?: string;
     content?: SectionContent;
 }
 
@@ -33,9 +35,19 @@ function formatRupiah(value: number): string {
     }).format(value);
 }
 
+const SEASONAL_KEYWORDS = [
+    'seasonal',
+    'festive',
+    'ramadan',
+    'lebaran',
+    'natal',
+    'imlek',
+];
+
 export default function CatalogSection({
     products = [],
     categories: serverCategories = [],
+    featuredCategory,
     content,
 }: CatalogSectionProps) {
     const items = products;
@@ -53,42 +65,54 @@ export default function CatalogSection({
     );
     const ctaLabel = getCmsText(content, 'cta_label', 'Lihat Katalog Lengkap');
 
-    // Kategori / Event dinamis dari data produk & backend categories
-    const categories = [
-        'Semua',
-        ...Array.from(
-            new Set(
-                [
-                    ...serverCategories,
-                    ...items.map((p) => p.category),
-                    ...items.map((p) => p.event_category),
-                ].filter(Boolean),
-            ),
+    // Kategori / Event / Season dinamis dari data produk & backend categories
+    const allCategoryOptions = Array.from(
+        new Set(
+            [
+                ...serverCategories,
+                ...items.map((p) => p.category),
+                ...items.map((p) => p.event_category),
+                ...items.map((p) => p.season_tag),
+            ]
+                .map((value) => (value ?? '').trim())
+                .filter((value): value is string => value !== ''),
         ),
-    ];
+    );
 
-    const seasons = [
-        'Semua',
-        ...Array.from(
-            new Set(
-                items
-                    .map((p) => p.season_tag)
-                    .filter((s): s is string => Boolean(s && s.trim() !== '')),
-            ),
-        ),
-    ];
+    const activeSeasonCategory =
+        featuredCategory && featuredCategory.trim() !== ''
+            ? featuredCategory.trim()
+            : (allCategoryOptions.find(
+                  (cat) => cat.toLowerCase() === 'seasonal & festive',
+              ) ??
+              allCategoryOptions.find((cat) =>
+                  SEASONAL_KEYWORDS.some((kw) =>
+                      cat.toLowerCase().includes(kw),
+                  ),
+              ) ??
+              'Seasonal & Festive');
+
+    const otherCategories = allCategoryOptions.filter(
+        (cat) => cat.toLowerCase() !== activeSeasonCategory.toLowerCase(),
+    );
 
     const { auth } = usePage<SharedPageProps>().props;
     const isAuthenticated = Boolean(auth?.user);
 
-    const [activeCategory, setActiveCategory] = useState('Semua');
-    const [activeSeason, setActiveSeason] = useState('Semua');
+    const [activeCategory, setActiveCategory] = useState('all');
     const [onlyBestSeller, setOnlyBestSeller] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(
         null,
     );
     const [modalQuantity, setModalQuantity] = useState(1);
     const [addingProductId, setAddingProductId] = useState<number | null>(null);
+
+    const isAllActive = activeCategory === 'all' && !onlyBestSeller;
+    const isSeasonActive =
+        activeCategory.toLowerCase() === activeSeasonCategory.toLowerCase();
+    const isOtherCategoryActive = activeCategory !== 'all' && !isSeasonActive;
 
     const openDetailModal = (product: Product) => {
         setModalQuantity(1);
@@ -135,6 +159,36 @@ export default function CatalogSection({
         );
     };
 
+    // Tutup dropdown kategori saat klik di luar area dropdown atau tekan Escape
+    useEffect(() => {
+        if (!isDropdownOpen) {
+            return;
+        }
+
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        const handleEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        window.addEventListener('keydown', handleEscape);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            window.removeEventListener('keydown', handleEscape);
+        };
+    }, [isDropdownOpen]);
+
     // Kunci scroll body ketika modal terbuka
     useEffect(() => {
         if (selectedProduct) {
@@ -156,32 +210,27 @@ export default function CatalogSection({
         };
     }, [selectedProduct]);
 
-    // Filter produk (Kategori/Event + Best Selling per Season) dan batasi maksimal 8 produk
+    // Filter produk (Kategori/Event/Season + Best Seller) dan batasi maksimal 8 produk
     const filteredProducts = items.filter((p) => {
+        const normalizedActive = activeCategory.toLowerCase();
         const matchesCategory =
-            activeCategory === 'Semua' ||
-            p.category?.toLowerCase() === activeCategory.toLowerCase() ||
-            p.event_category?.toLowerCase() === activeCategory.toLowerCase();
+            activeCategory === 'all' ||
+            p.category?.toLowerCase() === normalizedActive ||
+            p.event_category?.toLowerCase() === normalizedActive ||
+            (p.season_tag ?? '').toLowerCase() === normalizedActive;
 
         const matchesBestSeller = !onlyBestSeller || Boolean(p.is_best_seller);
 
-        const matchesSeason =
-            activeSeason === 'Semua' ||
-            (p.season_tag ?? '').toLowerCase() === activeSeason.toLowerCase();
-
-        return matchesCategory && matchesBestSeller && matchesSeason;
+        return matchesCategory && matchesBestSeller;
     });
 
     const displayedProducts = filteredProducts.slice(0, 8);
-    const hasActiveFilter =
-        activeCategory !== 'Semua' ||
-        onlyBestSeller ||
-        activeSeason !== 'Semua';
+    const hasActiveFilter = activeCategory !== 'all' || onlyBestSeller;
 
     const resetFilters = () => {
-        setActiveCategory('Semua');
+        setActiveCategory('all');
         setOnlyBestSeller(false);
-        setActiveSeason('Semua');
+        setIsDropdownOpen(false);
     };
 
     return (
@@ -190,8 +239,8 @@ export default function CatalogSection({
             className="relative scroll-mt-20 overflow-hidden bg-[#F2EBDC] py-20 md:py-28"
         >
             <div className="mx-auto max-w-7xl px-6">
-                {/* ── Tingkat 1: Header & Filter Kategori Dinamis ────────────── */}
-                <div className="relative mx-auto max-w-2xl text-center">
+                {/* ── Tingkat 1: Header & Bar Filter 1 Baris Ringkas ─────────── */}
+                <div className="relative z-20 mx-auto max-w-3xl text-center">
                     <div
                         aria-hidden="true"
                         className="pointer-events-none absolute -top-10 left-1/2 h-56 w-80 -translate-x-1/2 rounded-full blur-2xl"
@@ -206,49 +255,58 @@ export default function CatalogSection({
                     <h2 className="relative mt-3 font-serif text-3xl leading-tight font-normal tracking-normal text-[#16233B] sm:text-4xl lg:text-5xl">
                         {title}
                     </h2>
-                    <p className="relative mt-4 font-sans text-sm font-normal text-[#6E675D] sm:text-base">
+                    <p className="relative mx-auto mt-4 max-w-2xl font-sans text-sm font-normal text-[#6E675D] sm:text-base">
                         {description}
                     </p>
 
-                    {/* Filter Tab Kategori / Event Dinamis */}
-                    {categories.length > 1 && (
-                        <div className="relative mt-8 flex flex-wrap items-center justify-center gap-2">
-                            {categories.map((category) => {
-                                const isActive =
-                                    activeCategory.toLowerCase() ===
-                                    category.toLowerCase();
-                                return (
-                                    <button
-                                        key={category}
-                                        type="button"
-                                        onClick={() =>
-                                            setActiveCategory(category)
-                                        }
-                                        className={`rounded-full px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
-                                            isActive
-                                                ? 'bg-[#16233B] text-[#F2EBDC] shadow-sm'
-                                                : 'border border-[#A88B54]/30 bg-[#FAF7F0] text-[#6E675D] shadow-[0_2px_8px_-2px_rgba(22,35,59,0.06)] hover:border-[#16233B] hover:text-[#16233B]'
-                                        }`}
-                                    >
-                                        {category}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    )}
-
-                    {/* Filter Best Selling per Season */}
+                    {/* Bar Filter 1 Baris Ringkas */}
                     {items.length > 0 && (
-                        <div className="relative mt-4 flex flex-wrap items-center justify-center gap-2">
+                        <div className="relative mt-8 flex flex-wrap items-center justify-center gap-2.5">
+                            {/* 1) Semua */}
                             <button
                                 type="button"
-                                onClick={() =>
-                                    setOnlyBestSeller((prev) => !prev)
-                                }
-                                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 font-sans text-xs font-semibold transition-all duration-300 ${
+                                onClick={() => {
+                                    setActiveCategory('all');
+                                    setOnlyBestSeller(false);
+                                    setIsDropdownOpen(false);
+                                }}
+                                className={`inline-flex items-center rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
+                                    isAllActive
+                                        ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-sm'
+                                        : 'border-[#16233B]/15 bg-white text-[#16233B] hover:border-[#A88B54]'
+                                }`}
+                            >
+                                Semua
+                            </button>
+
+                            {/* 2) Season Berlangsung */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setActiveCategory(activeSeasonCategory);
+                                    setIsDropdownOpen(false);
+                                }}
+                                className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
+                                    isSeasonActive
+                                        ? 'border-[#A88B54]/60 bg-[#16233B] text-[#F2EBDC] shadow-sm'
+                                        : 'border-[#A88B54]/50 bg-[#FAF7F0] text-[#16233B] hover:border-[#A88B54] hover:bg-[#A88B54]/10'
+                                }`}
+                            >
+                                <SparklesIcon className="size-3.5 text-[#A88B54]" />
+                                {activeSeasonCategory}
+                            </button>
+
+                            {/* 3) ★ Best Seller */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setOnlyBestSeller((prev) => !prev);
+                                    setIsDropdownOpen(false);
+                                }}
+                                className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
                                     onlyBestSeller
-                                        ? 'bg-[#16233B] text-[#F2EBDC] shadow-sm'
-                                        : 'border border-[#A88B54]/30 bg-[#FAF7F0] text-[#16233B] hover:border-[#16233B]'
+                                        ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-sm'
+                                        : 'border-[#16233B]/15 bg-white text-[#16233B] hover:border-[#A88B54]'
                                 }`}
                             >
                                 <StarIcon
@@ -261,33 +319,118 @@ export default function CatalogSection({
                                 Best Seller
                             </button>
 
-                            {seasons.length > 1 &&
-                                seasons.map((season) => {
-                                    const isSeasonActive =
-                                        activeSeason.toLowerCase() ===
-                                        season.toLowerCase();
-                                    return (
-                                        <button
-                                            key={season}
-                                            type="button"
-                                            onClick={() =>
-                                                setActiveSeason(season)
-                                            }
-                                            className={`inline-flex items-center gap-1 rounded-full px-3.5 py-1.5 font-sans text-xs font-medium transition-all duration-300 ${
-                                                isSeasonActive
-                                                    ? 'bg-[#1E2F4D] text-[#F2EBDC] shadow-xs'
-                                                    : 'border border-[#A88B54]/25 bg-[#FAF7F0] text-[#6E675D] hover:border-[#16233B] hover:text-[#16233B]'
-                                            }`}
+                            {/* 4) Dropdown Kategori Lainnya */}
+                            <div ref={dropdownRef} className="relative">
+                                <button
+                                    type="button"
+                                    aria-expanded={isDropdownOpen}
+                                    aria-haspopup="listbox"
+                                    onClick={() =>
+                                        setIsDropdownOpen((prev) => !prev)
+                                    }
+                                    className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
+                                        isOtherCategoryActive
+                                            ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-sm'
+                                            : 'border-[#16233B]/15 bg-white text-[#16233B] hover:border-[#A88B54]'
+                                    }`}
+                                >
+                                    <span>
+                                        {isOtherCategoryActive
+                                            ? activeCategory
+                                            : 'Kategori Lainnya'}
+                                    </span>
+                                    <ChevronDownIcon
+                                        className={`size-3.5 transition-transform duration-200 ${
+                                            isDropdownOpen ? 'rotate-180' : ''
+                                        } ${
+                                            isOtherCategoryActive
+                                                ? 'text-[#A88B54]'
+                                                : 'text-[#6E675D]'
+                                        }`}
+                                    />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isDropdownOpen && (
+                                        <motion.div
+                                            role="listbox"
+                                            aria-label="Pilih kategori lainnya"
+                                            initial={{
+                                                opacity: 0,
+                                                y: -6,
+                                                scale: 0.98,
+                                            }}
+                                            animate={{
+                                                opacity: 1,
+                                                y: 0,
+                                                scale: 1,
+                                            }}
+                                            exit={{
+                                                opacity: 0,
+                                                y: -6,
+                                                scale: 0.98,
+                                            }}
+                                            transition={{
+                                                duration: 0.18,
+                                                ease: [
+                                                    0.16, 1, 0.3, 1,
+                                                ] as const,
+                                            }}
+                                            className="absolute top-full left-1/2 z-30 mt-2 min-w-[230px] -translate-x-1/2 rounded-2xl border border-[#16233B]/15 bg-white p-2 text-left shadow-xl"
                                         >
-                                            {season !== 'Semua' && (
-                                                <SparklesIcon className="size-3 text-[#A88B54]" />
+                                            {otherCategories.length > 0 ? (
+                                                <div className="space-y-1">
+                                                    {otherCategories.map(
+                                                        (category) => {
+                                                            const isSelected =
+                                                                activeCategory.toLowerCase() ===
+                                                                category.toLowerCase();
+                                                            return (
+                                                                <button
+                                                                    key={
+                                                                        category
+                                                                    }
+                                                                    type="button"
+                                                                    role="option"
+                                                                    aria-selected={
+                                                                        isSelected
+                                                                    }
+                                                                    onClick={() => {
+                                                                        setActiveCategory(
+                                                                            category,
+                                                                        );
+                                                                        setIsDropdownOpen(
+                                                                            false,
+                                                                        );
+                                                                    }}
+                                                                    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left font-sans text-xs font-medium transition-colors ${
+                                                                        isSelected
+                                                                            ? 'bg-[#16233B] text-[#F2EBDC]'
+                                                                            : 'text-[#16233B] hover:bg-[#F2EBDC]'
+                                                                    }`}
+                                                                >
+                                                                    <span>
+                                                                        {
+                                                                            category
+                                                                        }
+                                                                    </span>
+                                                                    {isSelected && (
+                                                                        <CheckIcon className="size-3.5 shrink-0 text-[#A88B54]" />
+                                                                    )}
+                                                                </button>
+                                                            );
+                                                        },
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <p className="px-3 py-2 font-sans text-xs text-[#6E675D]">
+                                                    Belum ada kategori lainnya.
+                                                </p>
                                             )}
-                                            {season === 'Semua'
-                                                ? 'Semua Season'
-                                                : season}
-                                        </button>
-                                    );
-                                })}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         </div>
                     )}
                 </div>

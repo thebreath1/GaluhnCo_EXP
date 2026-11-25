@@ -169,39 +169,50 @@ export default function ProductsIndex({ products }: PageProps) {
         <>
             <Head title="Manajemen Produk" />
 
-            <div className="space-y-5 p-6">
+            <div className="space-y-6 p-6 sm:p-8">
                 {/* Header */}
-                <div className="flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-gray-900">
-                        Daftar Produk
-                    </h1>
-                    <Button onClick={openCreate} className="gap-2 rounded-xl">
-                        <PlusIcon className="size-4" />
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#A88B54]/20 pb-5">
+                    <div>
+                        <h1 className="font-serif text-2xl font-normal text-[#16233B] sm:text-3xl">
+                            Daftar Produk
+                        </h1>
+                        <p className="mt-0.5 font-sans text-xs text-[#6E675D] sm:text-sm">
+                            Kelola kurasi koleksi hampers, kategori acara, dan
+                            tag musim.
+                        </p>
+                    </div>
+                    <Button
+                        onClick={openCreate}
+                        className="gap-2 rounded-full bg-[#16233B] px-5 text-[#F2EBDC] hover:bg-[#1F304F]"
+                    >
+                        <PlusIcon className="size-4 text-[#A88B54]" />
                         Tambah Produk
                     </Button>
                 </div>
 
                 {/* Summary cards */}
-                <div className="grid grid-cols-3 gap-3">
-                    <div className="rounded-2xl bg-emerald-800 px-5 py-4 text-white shadow-sm">
-                        <p className="text-xs font-medium opacity-80">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div className="rounded-2xl border border-[#A88B54]/40 bg-[#16233B] px-5 py-4 text-[#F2EBDC] shadow-xs">
+                        <p className="font-sans text-xs font-semibold tracking-wider text-[#F2EBDC]/80 uppercase">
                             Total Produk
                         </p>
-                        <p className="mt-1 text-3xl font-bold">
+                        <p className="mt-1 font-serif text-3xl font-semibold">
                             {products.length}
                         </p>
                     </div>
-                    <div className="rounded-2xl bg-emerald-600 px-5 py-4 text-white shadow-sm">
-                        <p className="text-xs font-medium opacity-80">Aktif</p>
-                        <p className="mt-1 text-3xl font-bold">
+                    <div className="rounded-2xl border border-[#A88B54]/35 bg-[#1E2F4D] px-5 py-4 text-[#F2EBDC] shadow-xs">
+                        <p className="font-sans text-xs font-semibold tracking-wider text-[#F2EBDC]/80 uppercase">
+                            Aktif
+                        </p>
+                        <p className="mt-1 font-serif text-3xl font-semibold text-[#A88B54]">
                             {products.filter((p) => p.is_active).length}
                         </p>
                     </div>
-                    <div className="rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
-                        <p className="text-xs font-medium text-gray-500">
+                    <div className="rounded-2xl border border-[#A88B54]/25 bg-white px-5 py-4 shadow-xs">
+                        <p className="font-sans text-xs font-semibold tracking-wider text-[#6E675D] uppercase">
                             Nonaktif
                         </p>
-                        <p className="mt-1 text-3xl font-bold text-gray-900">
+                        <p className="mt-1 font-serif text-3xl font-semibold text-[#16233B]">
                             {products.filter((p) => !p.is_active).length}
                         </p>
                     </div>
@@ -209,55 +220,55 @@ export default function ProductsIndex({ products }: PageProps) {
 
                 {/* Toolbar */}
                 <div className="flex items-center gap-3">
-                    <div className="flex max-w-xs flex-1 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 shadow-sm">
-                        <SearchIcon className="size-4 shrink-0 text-gray-400" />
+                    <div className="flex max-w-xs flex-1 items-center gap-2 rounded-xl border border-[#A88B54]/30 bg-white px-3.5 py-2 shadow-xs">
+                        <SearchIcon className="size-4 shrink-0 text-[#A88B54]" />
                         <input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Cari produk..."
-                            className="flex-1 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
+                            className="flex-1 bg-transparent font-sans text-sm text-[#16233B] outline-none placeholder:text-[#6E675D]/70"
                         />
                     </div>
-                    <span className="text-xs text-gray-400">
+                    <span className="font-sans text-xs font-medium text-[#6E675D]">
                         {filtered.length} produk
                     </span>
                 </div>
 
                 {/* Table */}
-                <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+                <div className="overflow-hidden rounded-2xl border border-[#A88B54]/25 bg-white shadow-xs">
                     <div className="overflow-x-auto">
                         <table className="min-w-full text-sm">
                             <thead>
-                                <tr className="border-b border-gray-100 bg-gray-50/60">
-                                    <th className="w-14 px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                <tr className="border-b border-[#A88B54]/20 bg-[#F2EBDC]/60">
+                                    <th className="w-14 px-4 py-3 text-left text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Foto
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Nama
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Kategori
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Harga Mulai
                                     </th>
-                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Urutan
                                     </th>
-                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-center text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Status
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-right text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                                         Aksi
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-[#A88B54]/15">
                                 {filtered.length === 0 ? (
                                     <tr>
                                         <td
                                             colSpan={7}
-                                            className="py-12 text-center text-sm text-gray-400"
+                                            className="py-12 text-center font-sans text-sm text-[#6E675D]"
                                         >
                                             {search
                                                 ? 'Tidak ada hasil yang cocok.'
@@ -268,61 +279,63 @@ export default function ProductsIndex({ products }: PageProps) {
                                     filtered.map((product) => (
                                         <tr
                                             key={product.id}
-                                            className="transition-colors hover:bg-gray-50/60"
+                                            className="transition-colors hover:bg-[#FAF7F0]"
                                         >
                                             <td className="px-4 py-3">
                                                 {product.image_url ? (
                                                     <img
                                                         src={product.image_url}
                                                         alt={product.name}
-                                                        className="size-11 rounded-xl object-cover"
+                                                        className="size-11 rounded-xl border border-[#A88B54]/20 object-cover"
                                                     />
                                                 ) : (
-                                                    <div className="flex size-11 items-center justify-center rounded-xl bg-gray-100 text-xs text-gray-400">
+                                                    <div className="flex size-11 items-center justify-center rounded-xl bg-[#F2EBDC] text-xs font-semibold text-[#6E675D]">
                                                         ?
                                                     </div>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3">
-                                                <p className="font-medium text-gray-900">
+                                                <p className="font-medium text-[#16233B]">
                                                     {product.name}
                                                 </p>
-                                                <p className="mt-0.5 line-clamp-1 text-xs text-gray-400">
+                                                <p className="mt-0.5 line-clamp-1 text-xs text-[#6E675D]">
                                                     {product.short_description}
                                                 </p>
                                             </td>
-                                            <td className="px-4 py-3 text-gray-600">
-                                                <p>{product.category}</p>
+                                            <td className="px-4 py-3 text-[#6E675D]">
+                                                <p className="text-[#16233B]">
+                                                    {product.category}
+                                                </p>
                                                 <div className="mt-1 flex flex-wrap gap-1">
-                                                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-700">
+                                                    <span className="rounded bg-[#F2EBDC] px-1.5 py-0.5 text-[10px] font-semibold text-[#16233B]">
                                                         {product.event_category}
                                                     </span>
                                                     {product.season_tag && (
-                                                        <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
+                                                        <span className="rounded border border-[#A88B54]/30 bg-[#FAF7F0] px-1.5 py-0.5 text-[10px] font-medium text-[#16233B]">
                                                             {product.season_tag}
                                                         </span>
                                                     )}
                                                     {product.is_best_seller && (
-                                                        <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
+                                                        <span className="rounded bg-[#16233B] px-1.5 py-0.5 text-[10px] font-semibold text-[#A88B54]">
                                                             Best Seller
                                                         </span>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3 text-right font-medium text-gray-900">
+                                            <td className="px-4 py-3 text-right font-serif text-base font-semibold text-[#16233B]">
                                                 {formatRupiah(
                                                     product.price_from,
                                                 )}
                                             </td>
-                                            <td className="px-4 py-3 text-center text-gray-600">
+                                            <td className="px-4 py-3 text-center text-[#6E675D]">
                                                 {product.sort_order}
                                             </td>
                                             <td className="px-4 py-3 text-center">
                                                 <span
                                                     className={cn(
-                                                        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium',
+                                                        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold',
                                                         product.is_active
-                                                            ? 'bg-green-50 text-green-700'
+                                                            ? 'bg-[#16233B] text-[#F2EBDC]'
                                                             : 'bg-gray-100 text-gray-500',
                                                     )}
                                                 >
@@ -330,7 +343,7 @@ export default function ProductsIndex({ products }: PageProps) {
                                                         className={cn(
                                                             'size-1.5 rounded-full',
                                                             product.is_active
-                                                                ? 'bg-green-500'
+                                                                ? 'bg-[#A88B54]'
                                                                 : 'bg-gray-400',
                                                         )}
                                                     />
@@ -346,7 +359,7 @@ export default function ProductsIndex({ products }: PageProps) {
                                                         onClick={() =>
                                                             openEdit(product)
                                                         }
-                                                        className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-500"
+                                                        className="rounded-lg p-1.5 text-[#6E675D] transition-colors hover:bg-[#F2EBDC] hover:text-[#16233B]"
                                                     >
                                                         <PencilIcon className="size-4" />
                                                     </button>
@@ -357,7 +370,7 @@ export default function ProductsIndex({ products }: PageProps) {
                                                                 product,
                                                             )
                                                         }
-                                                        className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                                                        className="rounded-lg p-1.5 text-[#6E675D] transition-colors hover:bg-red-50 hover:text-red-600"
                                                     >
                                                         <Trash2Icon className="size-4" />
                                                     </button>
@@ -374,9 +387,9 @@ export default function ProductsIndex({ products }: PageProps) {
 
             {/* Modal tambah/edit */}
             <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-                <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
+                <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto border-[#A88B54]/40 bg-[#FAF7F0] text-[#16233B]">
                     <DialogHeader>
-                        <DialogTitle>
+                        <DialogTitle className="font-serif text-2xl font-normal text-[#16233B]">
                             {editingProduct ? 'Edit Produk' : 'Tambah Produk'}
                         </DialogTitle>
                     </DialogHeader>
@@ -613,6 +626,7 @@ export default function ProductsIndex({ products }: PageProps) {
                             type="submit"
                             form="product-form"
                             disabled={processing}
+                            className="rounded-full bg-[#16233B] text-[#F2EBDC] hover:bg-[#1F304F]"
                         >
                             {processing
                                 ? 'Menyimpan...'

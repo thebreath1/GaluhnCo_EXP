@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\CartItem;
+use App\Models\LandingContent;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -51,6 +52,11 @@ class HandleInertiaRequests extends Middleware
                 : 0,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'whatsapp_number' => config('services.galuhco.whatsapp_number'),
+            'seasonalRibbon' => LandingContent::getSeasonalRibbon(),
+            'flash' => [
+                'error' => $request->session()->get('error'),
+                'success' => $request->session()->get('success'),
+            ],
         ];
     }
 }
