@@ -53,7 +53,7 @@ export default function AuthLayout({
                     className="mb-6 inline-flex items-center justify-center transition-opacity hover:opacity-90"
                 >
                     <img
-                        src="/asset/logo/Logo_galu&co.png"
+                        src="/Asset/Logo/Logo_galu&co.png"
                         alt="Galuh & Co."
                         loading="eager"
                         decoding="async"

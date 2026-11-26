@@ -85,7 +85,7 @@ export default function FooterSection({
                 <div className="space-y-4">
                     <div className="flex items-center">
                         <img
-                            src="/asset/logo/Logo_galu&co.png"
+                            src="/Asset/Logo/Logo_galu&co.png"
                             alt="Galuh & Co."
                             loading="lazy"
                             decoding="async"

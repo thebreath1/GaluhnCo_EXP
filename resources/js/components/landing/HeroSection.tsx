@@ -31,31 +31,31 @@ interface SeasonThemeConfig {
 const SEASONAL_THEMES: Record<SeasonThemeKey, SeasonThemeConfig> = {
     default: {
         eyebrowFallback: 'Signature Luxury Collection',
-        cutoutImage: '/asset/hero/parcel-default.svg',
+        cutoutImage: '/Asset/hero/parcel-default.svg',
         cutoutAlt:
             'Kurasi Gift Box Mewah Galuh & Co. dengan pita satin Muted Brass',
     },
     ramadan: {
         eyebrowFallback: 'RAMADAN CURATION 2026',
-        cutoutImage: '/asset/hero/parcel-ramadan.svg',
+        cutoutImage: '/Asset/hero/parcel-ramadan.svg',
         cutoutAlt:
             'Hampers Ramadan & Idul Fitri Galuh & Co. dengan ornamen ketupat emas',
     },
     christmas: {
         eyebrowFallback: 'NOEL & YEAR END 2026',
-        cutoutImage: '/asset/hero/parcel-christmas.svg',
+        cutoutImage: '/Asset/hero/parcel-christmas.svg',
         cutoutAlt:
             'Hampers Natal & Akhir Tahun Galuh & Co. dengan aksen pinus dan pita emas',
     },
     cny: {
         eyebrowFallback: 'LUNAR PROSPERITY EDITION',
-        cutoutImage: '/asset/hero/parcel-cny.svg',
+        cutoutImage: '/Asset/hero/parcel-cny.svg',
         cutoutAlt:
             'Hampers Imlek Galuh & Co. dengan simpul sutra emas dan kemasan mewah',
     },
     wedding: {
         eyebrowFallback: 'BESPOKE WEDDING & SOUVENIR',
-        cutoutImage: '/asset/hero/parcel-wedding.svg',
+        cutoutImage: '/Asset/hero/parcel-wedding.svg',
         cutoutAlt:
             'Keepsake Box Pernikahan & Souvenir Galuh & Co. dengan segel lilin eksklusif',
     },
@@ -600,7 +600,7 @@ export default function HeroSection({
                             className="relative z-10 flex flex-col items-center text-center"
                         >
                             <img
-                                src="/asset/logo/Logo_galu&co.png"
+                                src="/Asset/Logo/Logo_galu&co.png"
                                 alt="Galuh & Co."
                                 loading="eager"
                                 decoding="async"

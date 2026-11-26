@@ -297,37 +297,26 @@ function StatCard({
     variant: 'navy' | 'softNavy' | 'ivory';
     href: string;
 }) {
-    const styleClass =
-        variant === 'navy'
-            ? 'border-[#A88B54]/45 bg-[#16233B] text-[#F2EBDC]'
-            : variant === 'softNavy'
-              ? 'border-[#A88B54]/55 bg-[#1E2F4D] text-[#F2EBDC]'
-              : 'border-[#A88B54]/25 bg-white text-[#16233B] hover:border-[#A88B54]/60';
-
-    const labelClass =
-        variant === 'ivory' ? 'text-[#6E675D]' : 'text-[#F2EBDC]/80';
-    const iconClass = variant === 'ivory' ? 'text-[#A88B54]' : 'text-[#A88B54]';
+    const valueClass =
+        variant === 'softNavy' ? 'text-[#A88B54]' : 'text-[#16233B]';
 
     return (
         <Link
             href={href}
-            className={cn(
-                'relative flex flex-col justify-between rounded-2xl border p-5 shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md',
-                styleClass,
-            )}
+            className="relative flex flex-col justify-between rounded-2xl border border-[#A88B54]/25 bg-white p-5 text-[#16233B] shadow-xs transition-all hover:-translate-y-0.5 hover:border-[#A88B54]/60 hover:shadow-md"
         >
             <div className="flex items-start justify-between">
-                <p
-                    className={cn(
-                        'font-sans text-xs font-semibold tracking-wide uppercase',
-                        labelClass,
-                    )}
-                >
+                <p className="font-sans text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                     {label}
                 </p>
-                <ArrowUpRight className={cn('size-4', iconClass)} />
+                <ArrowUpRight className="size-4 text-[#A88B54]" />
             </div>
-            <p className="mt-3 font-serif text-3xl font-semibold">
+            <p
+                className={cn(
+                    'mt-3 font-serif text-3xl font-semibold',
+                    valueClass,
+                )}
+            >
                 {value.toLocaleString('id-ID')}
             </p>
         </Link>
@@ -351,10 +340,8 @@ function QuickActionCard({
         <Link
             href={href}
             className={cn(
-                'flex flex-col justify-between rounded-2xl border p-5 shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md',
-                highlight
-                    ? 'border-[#A88B54]/55 bg-[#16233B] text-[#F2EBDC]'
-                    : 'border-[#A88B54]/25 bg-white text-[#16233B] hover:border-[#A88B54]/60',
+                'flex flex-col justify-between rounded-2xl border bg-white p-5 text-[#16233B] shadow-xs transition-all hover:-translate-y-0.5 hover:border-[#A88B54]/60 hover:shadow-md',
+                highlight ? 'border-[#A88B54]/55' : 'border-[#A88B54]/25',
             )}
         >
             <div
@@ -366,20 +353,10 @@ function QuickActionCard({
                 {value}
             </div>
             <div>
-                <p
-                    className={cn(
-                        'font-sans text-sm font-semibold',
-                        highlight ? 'text-[#F2EBDC]' : 'text-[#16233B]',
-                    )}
-                >
+                <p className="font-sans text-sm font-semibold text-[#16233B]">
                     {label}
                 </p>
-                <p
-                    className={cn(
-                        'mt-0.5 font-sans text-xs',
-                        highlight ? 'text-[#F2EBDC]/75' : 'text-[#6E675D]',
-                    )}
-                >
+                <p className="mt-0.5 font-sans text-xs text-[#6E675D]">
                     {note}
                 </p>
             </div>

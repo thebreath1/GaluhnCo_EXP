@@ -380,29 +380,22 @@ function SummaryCard({
     count: number;
     variant: 'navy' | 'softNavy' | 'ivory';
 }) {
-    const styleClass =
-        variant === 'navy'
-            ? 'border-[#A88B54]/40 bg-[#16233B] text-[#F2EBDC]'
-            : variant === 'softNavy'
-              ? 'border-[#A88B54]/35 bg-[#1E2F4D] text-[#F2EBDC]'
-              : 'border-[#A88B54]/25 bg-white text-[#16233B]';
-
-    const labelClass =
-        variant === 'ivory' ? 'text-[#6E675D]' : 'text-[#F2EBDC]/80';
+    const countClass =
+        variant === 'softNavy' ? 'text-[#A88B54]' : 'text-[#16233B]';
 
     return (
-        <div
-            className={cn('rounded-2xl border px-5 py-4 shadow-xs', styleClass)}
-        >
-            <p
-                className={cn(
-                    'font-sans text-xs font-semibold tracking-wider uppercase',
-                    labelClass,
-                )}
-            >
+        <div className="rounded-2xl border border-[#A88B54]/25 bg-white px-5 py-4 text-[#16233B] shadow-xs">
+            <p className="font-sans text-xs font-semibold tracking-wider text-[#6E675D] uppercase">
                 {label}
             </p>
-            <p className="mt-1 font-serif text-3xl font-semibold">{count}</p>
+            <p
+                className={cn(
+                    'mt-1 font-serif text-3xl font-semibold',
+                    countClass,
+                )}
+            >
+                {count}
+            </p>
         </div>
     );
 }

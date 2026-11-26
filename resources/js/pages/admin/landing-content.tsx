@@ -467,11 +467,11 @@ const SECTION_SCHEMAS: SectionSchema[] = [
 type GroupedContents = Record<string, Record<string, string | null>>;
 
 const DEFAULT_CUTOUT_BY_THEME: Record<string, string> = {
-    default: '/asset/hero/parcel-default.svg',
-    ramadan: '/asset/hero/parcel-ramadan.svg',
-    christmas: '/asset/hero/parcel-christmas.svg',
-    cny: '/asset/hero/parcel-cny.svg',
-    wedding: '/asset/hero/parcel-wedding.svg',
+    default: '/Asset/hero/parcel-default.svg',
+    ramadan: '/Asset/hero/parcel-ramadan.svg',
+    christmas: '/Asset/hero/parcel-christmas.svg',
+    cny: '/Asset/hero/parcel-cny.svg',
+    wedding: '/Asset/hero/parcel-wedding.svg',
 };
 
 function resolveFieldSection(
@@ -769,10 +769,10 @@ export default function LandingContentCms({
                                                 </Label>
                                                 <span
                                                     className={cn(
-                                                        'rounded-full px-2.5 py-0.5 text-[11px] font-semibold',
+                                                        'rounded-full border px-2.5 py-0.5 text-[11px] font-semibold',
                                                         checked
-                                                            ? 'bg-[#16233B] text-[#F2EBDC]'
-                                                            : 'bg-gray-100 text-gray-600',
+                                                            ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                                                            : 'border-gray-200 bg-gray-100 text-gray-600',
                                                     )}
                                                 >
                                                     {checked

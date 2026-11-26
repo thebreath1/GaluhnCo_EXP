@@ -239,7 +239,7 @@ export default function CheckoutIndex({
                             className="flex items-center transition-opacity hover:opacity-90"
                         >
                             <img
-                                src="/asset/logo/Logo_galu&co.png"
+                                src="/Asset/Logo/Logo_galu&co.png"
                                 alt="Galuh & Co."
                                 className="h-8 w-auto object-contain sm:h-9"
                             />
@@ -315,11 +315,10 @@ export default function CheckoutIndex({
                                             return (
                                                 <label
                                                     key={addr.id}
-                                                    className={`cursor-pointer rounded-2xl border p-4 transition-all ${
-                                                        selected
-                                                            ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-md'
-                                                            : 'border-[#A88B54]/30 bg-white/80 text-[#16233B] hover:border-[#A88B54]'
-                                                    }`}
+                                                    className={`cursor-pointer rounded-2xl border p-4 transition-all ${selected
+                                                        ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-md'
+                                                        : 'border-[#A88B54]/30 bg-white/80 text-[#16233B] hover:border-[#A88B54]'
+                                                        }`}
                                                 >
                                                     <input
                                                         type="radio"
@@ -343,21 +342,19 @@ export default function CheckoutIndex({
                                                         )}
                                                     </div>
                                                     <p
-                                                        className={`mt-1.5 font-sans text-xs font-semibold ${
-                                                            selected
-                                                                ? 'text-[#F2EBDC]'
-                                                                : 'text-[#16233B]'
-                                                        }`}
+                                                        className={`mt-1.5 font-sans text-xs font-semibold ${selected
+                                                            ? 'text-[#F2EBDC]'
+                                                            : 'text-[#16233B]'
+                                                            }`}
                                                     >
                                                         {addr.recipient_name} ·{' '}
                                                         {addr.recipient_phone}
                                                     </p>
                                                     <p
-                                                        className={`mt-1 font-sans text-xs leading-relaxed ${
-                                                            selected
-                                                                ? 'text-[#F2EBDC]/80'
-                                                                : 'text-[#6E675D]'
-                                                        }`}
+                                                        className={`mt-1 font-sans text-xs leading-relaxed ${selected
+                                                            ? 'text-[#F2EBDC]/80'
+                                                            : 'text-[#6E675D]'
+                                                            }`}
                                                     >
                                                         {addr.address_line},{' '}
                                                         {addr.city}{' '}
@@ -557,9 +554,9 @@ export default function CheckoutIndex({
                                     const unitPrice = Number(item.unit_price);
                                     const itemName = item.is_custom_b2b
                                         ? (item.custom_config?.title ??
-                                          'Custom B2B Luxury Hampers')
+                                            'Custom B2B Luxury Hampers')
                                         : (item.product?.name ??
-                                          'Galuh & Co. Hampers');
+                                            'Galuh & Co. Hampers');
 
                                     return (
                                         <li
@@ -586,7 +583,7 @@ export default function CheckoutIndex({
                                                         ) &&
                                                             item.custom_config
                                                                 .items.length >
-                                                                0 && (
+                                                            0 && (
                                                                 <p className="font-sans text-[11px] text-[#6E675D]">
                                                                     Isi:{' '}
                                                                     {item.custom_config.items
@@ -606,14 +603,14 @@ export default function CheckoutIndex({
                                                 <p className="font-sans text-xs text-[#6E675D]">
                                                     {item.quantity} ×{' '}
                                                     {item.active_promo &&
-                                                    (item.original_unit_price ??
-                                                        unitPrice) >
+                                                        (item.original_unit_price ??
+                                                            unitPrice) >
                                                         unitPrice ? (
                                                         <>
                                                             <span className="mr-1.5 line-through">
                                                                 {formatRupiah(
                                                                     item.original_unit_price ??
-                                                                        unitPrice,
+                                                                    unitPrice,
                                                                 )}
                                                             </span>
                                                             <span className="font-semibold text-[#16233B]">
@@ -640,7 +637,7 @@ export default function CheckoutIndex({
                             {/* Input Kode Promo di Checkout */}
                             <div className="mt-4 border-t border-[#A88B54]/20 pt-4">
                                 {applied_promotion &&
-                                applied_promotion.apply_mode === 'code' ? (
+                                    applied_promotion.apply_mode === 'code' ? (
                                     <div className="flex items-center justify-between gap-2 rounded-xl border border-[#A88B54]/40 bg-white px-3.5 py-2.5 text-xs">
                                         <div className="min-w-0">
                                             <p className="font-semibold text-[#16233B]">
@@ -712,8 +709,7 @@ export default function CheckoutIndex({
                                     <div className="flex items-center justify-between text-xs text-emerald-700">
                                         <span>Diskon Produk Katalog</span>
                                         <span className="font-semibold">
-                                            -
-                                            {formatRupiah(items_discount_total)}
+                                            -{formatRupiah(items_discount_total)}
                                         </span>
                                     </div>
                                 )}

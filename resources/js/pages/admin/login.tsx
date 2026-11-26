@@ -112,7 +112,7 @@ export default function AdminLogin() {
                             className="inline-flex items-center transition-opacity hover:opacity-90"
                         >
                             <img
-                                src="/asset/logo/Logo_galu&co.png"
+                                src="/Asset/Logo/Logo_galu&co.png"
                                 alt="Galuh & Co."
                                 className="h-9 w-auto object-contain sm:h-11"
                             />

@@ -53,7 +53,7 @@ export default function GreetingShow({
 
                     <Link href={home()} className="flex items-center">
                         <img
-                            src="/asset/logo/Logo_galu&co.png"
+                            src="/Asset/Logo/Logo_galu&co.png"
                             alt="Galuh & Co."
                             className="h-8 w-auto object-contain sm:h-9"
                         />

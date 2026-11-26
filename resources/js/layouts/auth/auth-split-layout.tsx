@@ -55,7 +55,7 @@ export default function AuthSplitLayout({
                         className="inline-flex items-center transition-opacity hover:opacity-90"
                     >
                         <img
-                            src="/asset/logo/Logo_galu&co.png"
+                            src="/Asset/Logo/Logo_galu&co.png"
                             alt="Galuh & Co."
                             className="h-11 w-auto object-contain"
                         />
@@ -119,7 +119,7 @@ export default function AuthSplitLayout({
                             className="inline-flex items-center rounded-full bg-[#16233B] px-3.5 py-1.5 transition-opacity hover:opacity-90 lg:hidden"
                         >
                             <img
-                                src="/asset/logo/Logo_galu&co.png"
+                                src="/Asset/Logo/Logo_galu&co.png"
                                 alt="Galuh & Co."
                                 className="h-6 w-auto object-contain"
                             />

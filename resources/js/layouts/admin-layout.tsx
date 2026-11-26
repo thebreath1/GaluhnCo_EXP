@@ -103,7 +103,7 @@ export default function AdminLayout({ children }: Props) {
                             className="flex flex-col gap-1 transition-opacity hover:opacity-90"
                         >
                             <img
-                                src="/asset/logo/Logo_galu&co.png"
+                                src="/Asset/Logo/Logo_galu&co.png"
                                 alt="Galuh & Co."
                                 className="h-8 w-auto object-contain"
                             />

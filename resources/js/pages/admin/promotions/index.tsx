@@ -359,16 +359,16 @@ export default function PromotionsIndex({
 
                 {/* Summary cards */}
                 <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                    <div className="rounded-2xl border border-[#A88B54]/40 bg-[#16233B] px-5 py-4 text-[#F2EBDC] shadow-xs">
-                        <p className="font-sans text-xs font-semibold tracking-wider text-[#F2EBDC]/80 uppercase">
+                    <div className="rounded-2xl border border-[#A88B54]/25 bg-white px-5 py-4 text-[#16233B] shadow-xs">
+                        <p className="font-sans text-xs font-semibold tracking-wider text-[#6E675D] uppercase">
                             Total Promo
                         </p>
                         <p className="mt-1 font-serif text-3xl font-semibold">
                             {promotions.length}
                         </p>
                     </div>
-                    <div className="rounded-2xl border border-[#A88B54]/35 bg-[#1E2F4D] px-5 py-4 text-[#F2EBDC] shadow-xs">
-                        <p className="font-sans text-xs font-semibold tracking-wider text-[#F2EBDC]/80 uppercase">
+                    <div className="rounded-2xl border border-[#A88B54]/25 bg-white px-5 py-4 text-[#16233B] shadow-xs">
+                        <p className="font-sans text-xs font-semibold tracking-wider text-[#6E675D] uppercase">
                             Berlangsung
                         </p>
                         <p className="mt-1 font-serif text-3xl font-semibold text-[#A88B54]">

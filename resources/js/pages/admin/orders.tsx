@@ -219,8 +219,8 @@ export default function AdminOrders({
 
                 {/* Summary Stat Cards */}
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-                    <div className="rounded-2xl border border-[#A88B54]/40 bg-[#16233B] px-4 py-3.5 text-[#F2EBDC] shadow-xs">
-                        <p className="font-sans text-xs font-semibold tracking-wide text-[#F2EBDC]/80 uppercase">
+                    <div className="rounded-2xl border border-[#A88B54]/25 bg-white px-4 py-3.5 text-[#16233B] shadow-xs">
+                        <p className="font-sans text-xs font-semibold tracking-wide text-[#6E675D] uppercase">
                             Total Pesanan
                         </p>
                         <p className="mt-1 font-serif text-2xl font-semibold">

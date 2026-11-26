@@ -153,16 +153,16 @@ export default function PartnersIndex({ partners }: PageProps) {
 
                 {/* Summary cards */}
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                    <div className="rounded-2xl border border-[#A88B54]/40 bg-[#16233B] px-5 py-4 text-[#F2EBDC] shadow-xs">
-                        <p className="font-sans text-xs font-semibold tracking-wider text-[#F2EBDC]/80 uppercase">
+                    <div className="rounded-2xl border border-[#A88B54]/25 bg-white px-5 py-4 text-[#16233B] shadow-xs">
+                        <p className="font-sans text-xs font-semibold tracking-wider text-[#6E675D] uppercase">
                             Total Partner
                         </p>
                         <p className="mt-1 font-serif text-3xl font-semibold">
                             {partners.length}
                         </p>
                     </div>
-                    <div className="rounded-2xl border border-[#A88B54]/35 bg-[#1E2F4D] px-5 py-4 text-[#F2EBDC] shadow-xs">
-                        <p className="font-sans text-xs font-semibold tracking-wider text-[#F2EBDC]/80 uppercase">
+                    <div className="rounded-2xl border border-[#A88B54]/25 bg-white px-5 py-4 text-[#16233B] shadow-xs">
+                        <p className="font-sans text-xs font-semibold tracking-wider text-[#6E675D] uppercase">
                             Aktif
                         </p>
                         <p className="mt-1 font-serif text-3xl font-semibold text-[#A88B54]">
@@ -270,17 +270,17 @@ export default function PartnersIndex({ partners }: PageProps) {
                                             <td className="px-4 py-3 text-center">
                                                 <span
                                                     className={cn(
-                                                        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold',
+                                                        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold',
                                                         partner.is_active
-                                                            ? 'bg-[#16233B] text-[#F2EBDC]'
-                                                            : 'bg-gray-100 text-gray-500',
+                                                            ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                                                            : 'border-gray-200 bg-gray-100 text-gray-500',
                                                     )}
                                                 >
                                                     <span
                                                         className={cn(
                                                             'size-1.5 rounded-full',
                                                             partner.is_active
-                                                                ? 'bg-[#A88B54]'
+                                                                ? 'bg-emerald-500'
                                                                 : 'bg-gray-400',
                                                         )}
                                                     />

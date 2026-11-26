@@ -68,7 +68,7 @@ export default function Navbar() {
 
     const logoImage = (
         <img
-            src="/asset/logo/Logo_galu&co.png"
+            src="/Asset/Logo/gnc-hitam.png"
             alt="Galuh & Co."
             loading="eager"
             decoding="async"
@@ -182,7 +182,7 @@ export default function Navbar() {
                         <div className="flex flex-col space-y-4">
                             <div className="flex items-center justify-between border-b border-[#A88B54]/25 pb-3">
                                 <img
-                                    src="/asset/logo/Logo_galu&co.png"
+                                    src="/Asset/Logo/gnc-hitam.png"
                                     alt="Galuh & Co."
                                     loading="lazy"
                                     decoding="async"
