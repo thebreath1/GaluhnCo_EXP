@@ -6,7 +6,9 @@ import {
     PlusIcon,
     ShoppingBagIcon,
     SparklesIcon,
+    TagIcon,
     Trash2Icon,
+    XIcon,
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -36,8 +38,38 @@ interface CartItemEntry {
     is_custom_b2b: boolean;
     custom_config: CustomConfig | null;
     quantity: number;
+    original_unit_price?: number;
     unit_price: number;
+    item_discount_total?: number;
     subtotal: number;
+    active_promo?: {
+        id: number;
+        name: string;
+        badge_text: string | null;
+        discount_type: string;
+        discount_value: number;
+        discount_label: string;
+        ends_at: string | null;
+    } | null;
+}
+
+interface CartSummary {
+    items_original_subtotal: number;
+    items_discount_total: number;
+    subtotal: number;
+    applied_promotion: {
+        id: number;
+        name: string;
+        code: string | null;
+        apply_mode: string;
+        discount_type: string;
+        discount_value: number;
+        discount_label: string;
+        discount_amount: number;
+    } | null;
+    promo_discount: number;
+    total_discount: number;
+    total: number;
 }
 
 function formatRupiah(value: number): string {
@@ -48,16 +80,66 @@ function formatRupiah(value: number): string {
     }).format(value);
 }
 
-export default function CartIndex({ items = [] }: { items?: CartItemEntry[] }) {
-    const { auth } = usePage<SharedPageProps>().props;
+export default function CartIndex({
+    items = [],
+    summary,
+}: {
+    items?: CartItemEntry[];
+    summary?: CartSummary;
+}) {
+    const { auth, errors } = usePage<
+        SharedPageProps & { errors?: { promo_code?: string } }
+    >().props;
     const isB2B = auth?.user?.role === 'b2b';
     const [busyId, setBusyId] = useState<number | null>(null);
+    const [promoInput, setPromoInput] = useState('');
+    const [applyingPromo, setApplyingPromo] = useState(false);
 
     const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalSubtotal = items.reduce(
+    const fallbackSubtotal = items.reduce(
         (sum, item) => sum + item.unit_price * item.quantity,
         0,
     );
+    const itemsDiscountTotal = summary?.items_discount_total ?? 0;
+    const subtotal = summary?.subtotal ?? fallbackSubtotal;
+    const appliedPromo = summary?.applied_promotion ?? null;
+    const promoDiscount = summary?.promo_discount ?? 0;
+    const finalTotal = summary?.total ?? subtotal;
+
+    const handleApplyPromo = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (promoInput.trim() === '') return;
+
+        setApplyingPromo(true);
+        router.post(
+            CartController.applyPromo().url,
+            { code: promoInput.trim() },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setPromoInput('');
+                    toast.success('Kode promo berhasil diterapkan.');
+                },
+                onError: (errs) => {
+                    if (errs.promo_code) {
+                        toast.error(errs.promo_code);
+                    }
+                },
+                onFinish: () => setApplyingPromo(false),
+            },
+        );
+    };
+
+    const handleRemovePromo = () => {
+        setApplyingPromo(true);
+        router.delete(CartController.removePromo().url, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Kode promo dihapus.');
+            },
+            onFinish: () => setApplyingPromo(false),
+        });
+    };
 
     const handleUpdateQuantity = (item: CartItemEntry, nextQty: number) => {
         const minQty = item.is_custom_b2b && isB2B ? 10 : 1;
@@ -260,14 +342,40 @@ export default function CartIndex({ items = [] }: { items?: CartItemEntry[] }) {
                                                     </div>
                                                 )}
 
-                                            <p className="mt-1.5 font-sans text-xs text-[#6E675D]">
-                                                Harga satuan:{' '}
-                                                <span className="font-semibold text-[#16233B]">
-                                                    {formatRupiah(
-                                                        item.unit_price,
-                                                    )}
-                                                </span>
-                                            </p>
+                                            <div className="mt-1.5 flex flex-wrap items-center gap-2 font-sans text-xs text-[#6E675D]">
+                                                <span>Harga satuan:</span>
+                                                {item.active_promo &&
+                                                (item.original_unit_price ??
+                                                    item.unit_price) >
+                                                    item.unit_price ? (
+                                                    <>
+                                                        <span className="line-through">
+                                                            {formatRupiah(
+                                                                item.original_unit_price ??
+                                                                    item.unit_price,
+                                                            )}
+                                                        </span>
+                                                        <span className="font-semibold text-[#16233B]">
+                                                            {formatRupiah(
+                                                                item.unit_price,
+                                                            )}
+                                                        </span>
+                                                        <span className="rounded bg-[#A88B54]/20 px-1.5 py-0.5 text-[10px] font-bold text-[#16233B]">
+                                                            {
+                                                                item
+                                                                    .active_promo
+                                                                    .discount_label
+                                                            }
+                                                        </span>
+                                                    </>
+                                                ) : (
+                                                    <span className="font-semibold text-[#16233B]">
+                                                        {formatRupiah(
+                                                            item.unit_price,
+                                                        )}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
 
                                         {/* Kuantitas & Subtotal */}
@@ -349,12 +457,118 @@ export default function CartIndex({ items = [] }: { items?: CartItemEntry[] }) {
                                             {totalQuantity} box
                                         </span>
                                     </div>
+                                    {itemsDiscountTotal > 0 && (
+                                        <div className="flex justify-between text-emerald-700">
+                                            <span>Diskon Katalog Otomatis</span>
+                                            <span className="font-semibold">
+                                                -
+                                                {formatRupiah(
+                                                    itemsDiscountTotal,
+                                                )}
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between text-[#6E675D]">
                                         <span>Subtotal Produk</span>
-                                        <span className="font-serif text-xl font-semibold text-[#16233B]">
-                                            {formatRupiah(totalSubtotal)}
+                                        <span className="font-semibold text-[#16233B]">
+                                            {formatRupiah(subtotal)}
                                         </span>
                                     </div>
+                                    {appliedPromo && promoDiscount > 0 && (
+                                        <div className="flex items-center justify-between text-emerald-700">
+                                            <span className="flex items-center gap-1">
+                                                <TagIcon className="size-3.5" />
+                                                <span>
+                                                    Promo{' '}
+                                                    {appliedPromo.code ??
+                                                        appliedPromo.name}
+                                                </span>
+                                            </span>
+                                            <span className="font-semibold">
+                                                -{formatRupiah(promoDiscount)}
+                                            </span>
+                                        </div>
+                                    )}
+                                    <div className="flex items-baseline justify-between border-t border-[#A88B54]/20 pt-2">
+                                        <span className="font-semibold text-[#16233B]">
+                                            Total Tagihan
+                                        </span>
+                                        <span className="font-serif text-xl font-semibold text-[#16233B]">
+                                            {formatRupiah(finalTotal)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Form Kode Promo */}
+                                <div className="mt-4">
+                                    {appliedPromo &&
+                                    appliedPromo.apply_mode === 'code' ? (
+                                        <div className="flex items-center justify-between gap-2 rounded-xl border border-[#A88B54]/40 bg-white px-3.5 py-2.5 text-xs">
+                                            <div className="min-w-0">
+                                                <p className="font-semibold text-[#16233B]">
+                                                    Kode {appliedPromo.code}{' '}
+                                                    aktif
+                                                </p>
+                                                <p className="truncate text-[11px] text-[#6E675D]">
+                                                    {appliedPromo.name} (
+                                                    {
+                                                        appliedPromo.discount_label
+                                                    }
+                                                    )
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                disabled={applyingPromo}
+                                                onClick={handleRemovePromo}
+                                                className="rounded-full p-1 text-[#6E675D] hover:bg-red-50 hover:text-red-600"
+                                                aria-label="Hapus kode promo"
+                                            >
+                                                <XIcon className="size-4" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <form
+                                            onSubmit={handleApplyPromo}
+                                            className="space-y-1.5"
+                                        >
+                                            <label
+                                                htmlFor="cart_promo_code"
+                                                className="block font-sans text-xs font-semibold text-[#16233B]"
+                                            >
+                                                Punya Kode Promo?
+                                            </label>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    id="cart_promo_code"
+                                                    type="text"
+                                                    value={promoInput}
+                                                    onChange={(e) =>
+                                                        setPromoInput(
+                                                            e.target.value.toUpperCase(),
+                                                        )
+                                                    }
+                                                    placeholder="Masukkan kode voucher"
+                                                    className="min-w-0 flex-1 rounded-xl border border-[#A88B54]/35 bg-white px-3 py-2 font-mono text-xs text-[#16233B] uppercase outline-none focus:border-[#16233B]"
+                                                />
+                                                <button
+                                                    type="submit"
+                                                    disabled={
+                                                        applyingPromo ||
+                                                        promoInput.trim() === ''
+                                                    }
+                                                    className="shrink-0 rounded-xl bg-[#16233B] px-4 py-2 font-sans text-xs font-semibold text-[#F2EBDC] transition-colors hover:bg-[#1F304F] disabled:opacity-50"
+                                                >
+                                                    Pakai
+                                                </button>
+                                            </div>
+                                            {errors?.promo_code && (
+                                                <p className="font-sans text-[11px] text-red-600">
+                                                    {errors.promo_code}
+                                                </p>
+                                            )}
+                                        </form>
+                                    )}
                                 </div>
 
                                 <p className="mt-4 font-sans text-[11px] leading-relaxed text-[#6E675D]">

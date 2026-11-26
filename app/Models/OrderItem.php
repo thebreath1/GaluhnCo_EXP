@@ -14,7 +14,9 @@ use Illuminate\Support\Carbon;
  * @property bool $is_custom_b2b
  * @property array<string, mixed>|null $custom_config
  * @property int $quantity
+ * @property string|null $original_unit_price
  * @property string $unit_price
+ * @property string $discount_amount
  * @property string $subtotal
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -28,7 +30,9 @@ class OrderItem extends Model
         'is_custom_b2b',
         'custom_config',
         'quantity',
+        'original_unit_price',
         'unit_price',
+        'discount_amount',
         'subtotal',
     ];
 
@@ -38,7 +42,9 @@ class OrderItem extends Model
             'is_custom_b2b' => 'boolean',
             'custom_config' => 'array',
             'quantity' => 'integer',
+            'original_unit_price' => 'decimal:2',
             'unit_price' => 'decimal:2',
+            'discount_amount' => 'decimal:2',
             'subtotal' => 'decimal:2',
         ];
     }

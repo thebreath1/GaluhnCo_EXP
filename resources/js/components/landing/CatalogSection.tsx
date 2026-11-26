@@ -15,14 +15,16 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import CartController from '@/actions/App/Http/Controllers/CartController';
+import { ActivePromoBanner } from '@/components/landing/ActivePromoBanner';
 import { getCmsText, type SectionContent } from '@/components/landing/cms';
 import { login } from '@/routes';
 import type { SharedPageProps } from '@/types';
-import type { Product } from '@/types/product';
+import type { Product, PublicPromotion } from '@/types/product';
 
 interface CatalogSectionProps {
     products?: Product[];
     categories?: string[];
+    activePromotions?: PublicPromotion[];
     featuredCategory?: string;
     content?: SectionContent;
 }
@@ -47,6 +49,7 @@ const SEASONAL_KEYWORDS = [
 export default function CatalogSection({
     products = [],
     categories: serverCategories = [],
+    activePromotions = [],
     featuredCategory,
     content,
 }: CatalogSectionProps) {
@@ -435,6 +438,8 @@ export default function CatalogSection({
                     )}
                 </div>
 
+                <ActivePromoBanner promotions={activePromotions} />
+
                 {/* ── Tingkat 2: Grid Kartu Produk atau Empty State ─────────── */}
                 {items.length === 0 ? (
                     /* Empty State: Belum ada produk di database */
@@ -537,6 +542,14 @@ export default function CatalogSection({
                                                     Best Seller
                                                 </span>
                                             )}
+                                            {product.active_promo && (
+                                                <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full bg-[#A88B54] px-2.5 py-0.5 font-sans text-[10px] font-bold tracking-wider text-[#16233B] uppercase shadow-sm">
+                                                    {product.active_promo
+                                                        .badge_text
+                                                        ? `${product.active_promo.badge_text} · ${product.active_promo.discount_label}`
+                                                        : `PROMO ${product.active_promo.discount_label}`}
+                                                </span>
+                                            )}
                                         </div>
 
                                         {/* Informasi Produk */}
@@ -573,16 +586,49 @@ export default function CatalogSection({
 
                                             <div className="mt-4">
                                                 {/* Harga Mulai */}
-                                                <div className="flex items-baseline gap-1.5">
-                                                    <span className="font-sans text-[11px] font-medium text-[#6E675D]">
-                                                        Mulai
-                                                    </span>
-                                                    <span className="font-serif text-base font-semibold text-[#16233B]">
-                                                        {formatRupiah(
-                                                            product.price_from,
-                                                        )}
-                                                    </span>
-                                                </div>
+                                                {product.active_promo &&
+                                                (product.discounted_price ??
+                                                    product.price_from) <
+                                                    product.price_from ? (
+                                                    <div className="space-y-0.5">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <span className="font-sans text-xs text-[#6E675D] line-through">
+                                                                {formatRupiah(
+                                                                    product.price_from,
+                                                                )}
+                                                            </span>
+                                                            <span className="rounded bg-[#A88B54]/20 px-1.5 py-0.5 font-sans text-[10px] font-bold text-[#16233B]">
+                                                                {
+                                                                    product
+                                                                        .active_promo
+                                                                        .discount_label
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-baseline gap-1.5">
+                                                            <span className="font-sans text-[11px] font-medium text-[#6E675D]">
+                                                                Mulai
+                                                            </span>
+                                                            <span className="font-serif text-base font-semibold text-[#16233B]">
+                                                                {formatRupiah(
+                                                                    product.discounted_price ??
+                                                                        product.price_from,
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-baseline gap-1.5">
+                                                        <span className="font-sans text-[11px] font-medium text-[#6E675D]">
+                                                            Mulai
+                                                        </span>
+                                                        <span className="font-serif text-base font-semibold text-[#16233B]">
+                                                            {formatRupiah(
+                                                                product.price_from,
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                )}
 
                                                 {/* Baris Dua Tombol Aksi */}
                                                 <div className="mt-4 flex items-center gap-2 border-t border-[#A88B54]/25 pt-3">
@@ -713,11 +759,43 @@ export default function CatalogSection({
                                             {selectedProduct.name}
                                         </h3>
 
-                                        <p className="mt-2 font-serif text-lg font-semibold text-[#16233B]">
-                                            {formatRupiah(
-                                                selectedProduct.price_from,
-                                            )}
-                                        </p>
+                                        {selectedProduct.active_promo &&
+                                        (selectedProduct.discounted_price ??
+                                            selectedProduct.price_from) <
+                                            selectedProduct.price_from ? (
+                                            <div className="mt-2 flex flex-wrap items-baseline gap-2">
+                                                <span className="font-serif text-lg font-semibold text-[#16233B]">
+                                                    {formatRupiah(
+                                                        selectedProduct.discounted_price ??
+                                                            selectedProduct.price_from,
+                                                    )}
+                                                </span>
+                                                <span className="font-sans text-xs text-[#6E675D] line-through">
+                                                    {formatRupiah(
+                                                        selectedProduct.price_from,
+                                                    )}
+                                                </span>
+                                                <span className="rounded-full bg-[#A88B54] px-2 py-0.5 font-sans text-[10px] font-bold text-[#16233B]">
+                                                    {
+                                                        selectedProduct
+                                                            .active_promo.name
+                                                    }{' '}
+                                                    (
+                                                    {
+                                                        selectedProduct
+                                                            .active_promo
+                                                            .discount_label
+                                                    }
+                                                    )
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <p className="mt-2 font-serif text-lg font-semibold text-[#16233B]">
+                                                {formatRupiah(
+                                                    selectedProduct.price_from,
+                                                )}
+                                            </p>
+                                        )}
 
                                         <p className="mt-3 font-sans text-xs leading-relaxed font-normal text-[#6E675D] sm:text-sm">
                                             {selectedProduct.short_description}
@@ -812,7 +890,7 @@ export default function CatalogSection({
                                             {addingProductId ===
                                             selectedProduct.id
                                                 ? 'Menambahkan...'
-                                                : `Tambah ke Keranjang (${formatRupiah(selectedProduct.price_from * modalQuantity)})`}
+                                                : `Tambah ke Keranjang (${formatRupiah((selectedProduct.discounted_price ?? selectedProduct.price_from) * modalQuantity)})`}
                                         </button>
                                         <p className="text-center font-sans text-[11px] text-[#6E675D]">
                                             Catatan kartu ucapan eksklusif dapat

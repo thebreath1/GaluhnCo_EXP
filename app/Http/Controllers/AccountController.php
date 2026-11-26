@@ -48,6 +48,10 @@ class AccountController extends Controller
             ->map(fn (Order $order): array => [
                 'id' => $order->id,
                 'order_number' => $order->order_number,
+                'promo_code' => $order->promo_code,
+                'promo_name' => $order->promo_name,
+                'subtotal_amount' => $order->subtotal_amount !== null ? (float) $order->subtotal_amount : (float) $order->total_amount,
+                'discount_amount' => (float) $order->discount_amount,
                 'total_amount' => (float) $order->total_amount,
                 'status' => $order->status,
                 'tracking_number' => $order->tracking_number,

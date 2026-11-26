@@ -14,6 +14,8 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PartnerController as AdminPartnerController;
 // Import controller untuk mengelola CRUD produk hampers di halaman admin
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+// Import controller untuk mengelola promo & diskon terjadwal di halaman admin
+use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
 // Import controller untuk 3D Customizer & pemutar video ucapan B2B
 use App\Http\Controllers\Auth\GoogleAuthController;
 // Import controller untuk autentikasi Google OAuth khusus pelanggan
@@ -67,6 +69,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
     Route::patch('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::post('/cart/promo', [CartController::class, 'applyPromo'])->name('cart.promo.apply');
+    Route::delete('/cart/promo', [CartController::class, 'removePromo'])->name('cart.promo.remove');
 
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
@@ -79,6 +83,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Mendaftarkan route CRUD produk (/admin/products) kecuali create, show, dan edit (karena memakai modal di halaman index)
         Route::resource('products', AdminProductController::class)->except(['create', 'show', 'edit']);
+
+        // Mendaftarkan route CRUD promo & diskon (/admin/promotions) + toggle aktif
+        Route::resource('promotions', AdminPromotionController::class)->except(['create', 'show', 'edit']);
+        Route::patch('/promotions/{promotion}/toggle', [AdminPromotionController::class, 'toggle'])->name('promotions.toggle');
 
         // Mendaftarkan route manajemen inquiry (/admin/inquiries) hanya untuk melihat daftar (index), ubah status (update), dan hapus (destroy)
         Route::resource('inquiries', AdminInquiryController::class)->only(['index', 'update', 'destroy']);

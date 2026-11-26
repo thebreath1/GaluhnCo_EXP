@@ -11,7 +11,12 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $order_number
  * @property int $user_id
+ * @property int|null $promotion_id
+ * @property string|null $promo_code
+ * @property string|null $promo_name
  * @property array<string, mixed> $address_snapshot
+ * @property string|null $subtotal_amount
+ * @property string $discount_amount
  * @property string $total_amount
  * @property string $status
  * @property string|null $tracking_number
@@ -39,7 +44,12 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'user_id',
+        'promotion_id',
+        'promo_code',
+        'promo_name',
         'address_snapshot',
+        'subtotal_amount',
+        'discount_amount',
         'total_amount',
         'status',
         'tracking_number',
@@ -57,12 +67,22 @@ class Order extends Model
     {
         return [
             'address_snapshot' => 'array',
+            'subtotal_amount' => 'decimal:2',
+            'discount_amount' => 'decimal:2',
             'total_amount' => 'decimal:2',
             'verified_at' => 'datetime',
             'packed_at' => 'datetime',
             'shipped_at' => 'datetime',
             'delivered_at' => 'datetime',
         ];
+    }
+
+    /**
+     * @return BelongsTo<Promotion, $this>
+     */
+    public function promotion(): BelongsTo
+    {
+        return $this->belongsTo(Promotion::class);
     }
 
     /**

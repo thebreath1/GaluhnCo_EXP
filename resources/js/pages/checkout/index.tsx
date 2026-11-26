@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import {
     ArrowLeftIcon,
     Building2Icon,
@@ -9,8 +9,10 @@ import {
     MapPinIcon,
     PlusIcon,
     SparklesIcon,
+    TagIcon,
     UploadCloudIcon,
     VideoIcon,
+    XIcon,
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -20,6 +22,7 @@ import CheckoutController from '@/actions/App/Http/Controllers/CheckoutControlle
 import type { StoredParcelItem } from '@/components/b2b/parcel-catalog';
 import { Spinner } from '@/components/ui/spinner';
 import { home } from '@/routes';
+import type { SharedPageProps } from '@/types';
 
 interface CheckoutCartItem {
     id: number;
@@ -31,7 +34,19 @@ interface CheckoutCartItem {
         items?: StoredParcelItem[];
     } | null;
     quantity: number;
+    original_unit_price?: number;
     unit_price: string | number;
+    item_discount_total?: number;
+    subtotal?: number;
+    active_promo?: {
+        id: number;
+        name: string;
+        badge_text: string | null;
+        discount_type: string;
+        discount_value: number;
+        discount_label: string;
+        ends_at: string | null;
+    } | null;
     product?: {
         id: number;
         name: string;
@@ -52,7 +67,22 @@ interface AddressOption {
 
 interface CheckoutProps {
     items: CheckoutCartItem[];
+    items_original_subtotal?: number;
+    items_discount_total?: number;
     subtotal: number;
+    applied_promotion?: {
+        id: number;
+        name: string;
+        code: string | null;
+        apply_mode: string;
+        discount_type: string;
+        discount_value: number;
+        discount_label: string;
+        discount_amount: number;
+    } | null;
+    promo_discount?: number;
+    total_discount?: number;
+    total?: number;
     addresses: AddressOption[];
     isB2B: boolean;
 }
@@ -69,15 +99,61 @@ function formatRupiah(value: number): string {
 
 export default function CheckoutIndex({
     items,
+    items_discount_total = 0,
     subtotal,
+    applied_promotion = null,
+    promo_discount = 0,
+    total,
     addresses,
     isB2B,
 }: CheckoutProps) {
     const defaultAddress =
         addresses.find((a) => a.is_default) ?? addresses[0] ?? null;
 
+    const { errors: pageErrors } = usePage<
+        SharedPageProps & { errors?: { promo_code?: string } }
+    >().props;
+
     const [paymentPreview, setPaymentPreview] = useState<string | null>(null);
     const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
+    const [promoInput, setPromoInput] = useState('');
+    const [applyingPromo, setApplyingPromo] = useState(false);
+
+    const finalTotal = total ?? subtotal;
+
+    const handleApplyPromo = () => {
+        if (promoInput.trim() === '') return;
+
+        setApplyingPromo(true);
+        router.post(
+            CartController.applyPromo().url,
+            { code: promoInput.trim() },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setPromoInput('');
+                    toast.success('Kode promo berhasil diterapkan.');
+                },
+                onError: (errs) => {
+                    if (errs.promo_code) {
+                        toast.error(errs.promo_code);
+                    }
+                },
+                onFinish: () => setApplyingPromo(false),
+            },
+        );
+    };
+
+    const handleRemovePromo = () => {
+        setApplyingPromo(true);
+        router.delete(CartController.removePromo().url, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Kode promo dihapus.');
+            },
+            onFinish: () => setApplyingPromo(false),
+        });
+    };
 
     const { data, setData, post, processing, errors } = useForm<{
         address_id: string;
@@ -529,7 +605,26 @@ export default function CheckoutIndex({
                                                 )}
                                                 <p className="font-sans text-xs text-[#6E675D]">
                                                     {item.quantity} ×{' '}
-                                                    {formatRupiah(unitPrice)}
+                                                    {item.active_promo &&
+                                                    (item.original_unit_price ??
+                                                        unitPrice) >
+                                                        unitPrice ? (
+                                                        <>
+                                                            <span className="mr-1.5 line-through">
+                                                                {formatRupiah(
+                                                                    item.original_unit_price ??
+                                                                        unitPrice,
+                                                                )}
+                                                            </span>
+                                                            <span className="font-semibold text-[#16233B]">
+                                                                {formatRupiah(
+                                                                    unitPrice,
+                                                                )}
+                                                            </span>
+                                                        </>
+                                                    ) : (
+                                                        formatRupiah(unitPrice)
+                                                    )}
                                                 </p>
                                             </div>
                                             <span className="shrink-0 font-serif text-base font-semibold text-[#16233B]">
@@ -542,13 +637,113 @@ export default function CheckoutIndex({
                                 })}
                             </ul>
 
-                            <div className="mt-4 border-t border-[#A88B54]/30 pt-4">
-                                <div className="flex items-baseline justify-between">
+                            {/* Input Kode Promo di Checkout */}
+                            <div className="mt-4 border-t border-[#A88B54]/20 pt-4">
+                                {applied_promotion &&
+                                applied_promotion.apply_mode === 'code' ? (
+                                    <div className="flex items-center justify-between gap-2 rounded-xl border border-[#A88B54]/40 bg-white px-3.5 py-2.5 text-xs">
+                                        <div className="min-w-0">
+                                            <p className="font-semibold text-[#16233B]">
+                                                Kode {applied_promotion.code}{' '}
+                                                diterapkan
+                                            </p>
+                                            <p className="truncate text-[11px] text-[#6E675D]">
+                                                {applied_promotion.name} (
+                                                {
+                                                    applied_promotion.discount_label
+                                                }
+                                                )
+                                            </p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            disabled={applyingPromo}
+                                            onClick={handleRemovePromo}
+                                            className="rounded-full p-1 text-[#6E675D] hover:bg-red-50 hover:text-red-600"
+                                            aria-label="Hapus kode promo"
+                                        >
+                                            <XIcon className="size-4" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-1.5">
+                                        <label
+                                            htmlFor="checkout_promo_code"
+                                            className="block font-sans text-xs font-semibold text-[#16233B]"
+                                        >
+                                            Kode Promo / Voucher (Opsional)
+                                        </label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                id="checkout_promo_code"
+                                                type="text"
+                                                value={promoInput}
+                                                onChange={(e) =>
+                                                    setPromoInput(
+                                                        e.target.value.toUpperCase(),
+                                                    )
+                                                }
+                                                placeholder="Masukkan kode"
+                                                className="min-w-0 flex-1 rounded-xl border border-[#A88B54]/35 bg-white px-3 py-2 font-mono text-xs text-[#16233B] uppercase outline-none focus:border-[#16233B]"
+                                            />
+                                            <button
+                                                type="button"
+                                                disabled={
+                                                    applyingPromo ||
+                                                    promoInput.trim() === ''
+                                                }
+                                                onClick={handleApplyPromo}
+                                                className="shrink-0 rounded-xl bg-[#16233B] px-4 py-2 font-sans text-xs font-semibold text-[#F2EBDC] transition-colors hover:bg-[#1F304F] disabled:opacity-50"
+                                            >
+                                                Terapkan
+                                            </button>
+                                        </div>
+                                        {pageErrors?.promo_code && (
+                                            <p className="font-sans text-[11px] text-red-600">
+                                                {pageErrors.promo_code}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="mt-4 space-y-2 border-t border-[#A88B54]/30 pt-4">
+                                {items_discount_total > 0 && (
+                                    <div className="flex items-center justify-between text-xs text-emerald-700">
+                                        <span>Diskon Produk Katalog</span>
+                                        <span className="font-semibold">
+                                            -
+                                            {formatRupiah(items_discount_total)}
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="flex items-center justify-between text-xs text-[#6E675D]">
+                                    <span>Subtotal</span>
+                                    <span className="font-semibold text-[#16233B]">
+                                        {formatRupiah(subtotal)}
+                                    </span>
+                                </div>
+                                {applied_promotion && promo_discount > 0 && (
+                                    <div className="flex items-center justify-between text-xs text-emerald-700">
+                                        <span className="flex items-center gap-1">
+                                            <TagIcon className="size-3.5" />
+                                            <span>
+                                                Promo{' '}
+                                                {applied_promotion.code ??
+                                                    applied_promotion.name}
+                                            </span>
+                                        </span>
+                                        <span className="font-semibold">
+                                            -{formatRupiah(promo_discount)}
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="flex items-baseline justify-between border-t border-[#A88B54]/20 pt-2">
                                     <span className="font-sans text-sm font-semibold text-[#16233B]">
                                         Total Tagihan
                                     </span>
                                     <span className="font-serif text-2xl font-semibold text-[#16233B]">
-                                        {formatRupiah(subtotal)}
+                                        {formatRupiah(finalTotal)}
                                     </span>
                                 </div>
                             </div>

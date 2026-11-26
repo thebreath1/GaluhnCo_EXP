@@ -13,6 +13,7 @@ import {
     MessageSquareTextIcon,
     PackageIcon,
     SettingsIcon,
+    TagIcon,
 } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
 import * as AdminInquiryController from '@/actions/App/Http/Controllers/Admin/InquiryController';
@@ -20,6 +21,7 @@ import * as AdminLandingContentController from '@/actions/App/Http/Controllers/A
 import * as AdminOrderController from '@/actions/App/Http/Controllers/Admin/OrderController';
 import * as AdminPartnerController from '@/actions/App/Http/Controllers/Admin/PartnerController';
 import * as AdminProductController from '@/actions/App/Http/Controllers/Admin/ProductController';
+import * as AdminPromotionController from '@/actions/App/Http/Controllers/Admin/PromotionController';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { dashboard, home, logout } from '@/routes';
@@ -36,6 +38,11 @@ const navItems = [
         href: AdminProductController.index().url,
         icon: PackageIcon,
         label: 'Produk',
+    },
+    {
+        href: AdminPromotionController.index().url,
+        icon: TagIcon,
+        label: 'Diskon & Promo',
     },
     {
         href: AdminOrderController.index().url,

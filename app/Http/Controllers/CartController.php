@@ -6,6 +6,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\PromotionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,6 +14,8 @@ use Inertia\Response;
 
 class CartController extends Controller
 {
+    public function __construct(private readonly PromotionService $promotionService) {}
+
     public function index(Request $request): Response
     {
         $user = $request->user();
@@ -23,7 +26,19 @@ class CartController extends Controller
             ->where('user_id', $user->id)
             ->first();
 
-        $items = $cart?->items->map(function (CartItem $item): array {
+        $rawPromoCode = $request->session()->get('applied_promo_code');
+        $promoCode = is_string($rawPromoCode) ? $rawPromoCode : null;
+
+        $cartItems = $cart !== null ? $cart->items : collect();
+        $evaluation = $this->promotionService->evaluateCart($cartItems, $promoCode);
+
+        if ($promoCode !== null && $evaluation['promo_error'] !== null) {
+            $request->session()->forget('applied_promo_code');
+        }
+
+        $items = collect($evaluation['items'])->map(function (array $entry): array {
+            /** @var CartItem $item */
+            $item = $entry['cart_item'];
             $imageUrl = null;
             if ($item->is_custom_b2b) {
                 $logoPath = is_array($item->custom_config) && isset($item->custom_config['logo_path']) && is_string($item->custom_config['logo_path'])
@@ -43,8 +58,6 @@ class CartController extends Controller
                 ? $item->custom_config['title']
                 : 'Custom B2B Luxury Hampers';
 
-            $unitPrice = (float) $item->unit_price;
-
             return [
                 'id' => $item->id,
                 'product_id' => $item->product_id,
@@ -56,13 +69,25 @@ class CartController extends Controller
                 'is_custom_b2b' => $item->is_custom_b2b,
                 'custom_config' => $item->custom_config,
                 'quantity' => $item->quantity,
-                'unit_price' => $unitPrice,
-                'subtotal' => $item->quantity * $unitPrice,
+                'original_unit_price' => $entry['original_unit_price'],
+                'unit_price' => $entry['unit_price'],
+                'item_discount_total' => $entry['item_discount_total'],
+                'subtotal' => $entry['subtotal'],
+                'active_promo' => $entry['active_promo'],
             ];
-        })->values()->all() ?? [];
+        })->values()->all();
 
         return Inertia::render('cart/index', [
             'items' => $items,
+            'summary' => [
+                'items_original_subtotal' => $evaluation['items_original_subtotal'],
+                'items_discount_total' => $evaluation['items_discount_total'],
+                'subtotal' => $evaluation['subtotal'],
+                'applied_promotion' => $evaluation['applied_promotion'],
+                'promo_discount' => $evaluation['promo_discount'],
+                'total_discount' => $evaluation['total_discount'],
+                'total' => $evaluation['total'],
+            ],
         ]);
     }
 
@@ -126,5 +151,38 @@ class CartController extends Controller
         $cartItem->delete();
 
         return back()->with('success', 'Item berhasil dihapus dari keranjang.');
+    }
+
+    public function applyPromo(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        abort_unless($user instanceof User, 403);
+
+        $validated = $request->validate([
+            'code' => ['required', 'string', 'max:50'],
+        ]);
+
+        $code = strtoupper(trim((string) $validated['code']));
+        $cart = Cart::query()
+            ->with('items.product')
+            ->where('user_id', $user->id)
+            ->first();
+
+        $evaluation = $this->promotionService->evaluateCart($cart !== null ? $cart->items : collect(), $code);
+
+        if ($evaluation['promo_error'] !== null) {
+            return back()->withErrors(['promo_code' => $evaluation['promo_error']]);
+        }
+
+        $request->session()->put('applied_promo_code', $code);
+
+        return back()->with('success', "Kode promo {$code} berhasil diterapkan.");
+    }
+
+    public function removePromo(Request $request): RedirectResponse
+    {
+        $request->session()->forget('applied_promo_code');
+
+        return back()->with('success', 'Kode promo dihapus.');
     }
 }

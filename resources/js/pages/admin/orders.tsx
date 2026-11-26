@@ -52,6 +52,10 @@ interface AdminOrder {
     customer_phone: string | null;
     customer_role: string;
     company_name: string | null;
+    promo_code?: string | null;
+    promo_name?: string | null;
+    subtotal_amount?: number;
+    discount_amount?: number;
     total_amount: number;
     status: string;
     tracking_number: string | null;
@@ -654,6 +658,36 @@ export default function AdminOrders({
                                             </li>
                                         ))}
                                     </ul>
+                                    {(selectedOrder.discount_amount ?? 0) >
+                                        0 && (
+                                        <div className="mt-3 space-y-1 border-t border-gray-100 pt-2.5 text-xs">
+                                            <div className="flex justify-between text-emerald-700">
+                                                <span>
+                                                    Diskon Promo
+                                                    {selectedOrder.promo_code
+                                                        ? ` (${selectedOrder.promo_code})`
+                                                        : selectedOrder.promo_name
+                                                          ? ` (${selectedOrder.promo_name})`
+                                                          : ''}
+                                                </span>
+                                                <span className="font-semibold">
+                                                    -
+                                                    {formatRupiah(
+                                                        selectedOrder.discount_amount ??
+                                                            0,
+                                                    )}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between font-semibold text-gray-900">
+                                                <span>Total Akhir</span>
+                                                <span>
+                                                    {formatRupiah(
+                                                        selectedOrder.total_amount,
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

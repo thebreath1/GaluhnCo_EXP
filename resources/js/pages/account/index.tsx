@@ -75,6 +75,10 @@ interface OrderItemEntry {
 interface OrderEntry {
     id: number;
     order_number: string;
+    promo_code?: string | null;
+    promo_name?: string | null;
+    subtotal_amount?: number;
+    discount_amount?: number;
     total_amount: number;
     status: string;
     tracking_number: string | null;
@@ -1210,6 +1214,40 @@ export default function AccountIndex({
                                                                 ),
                                                             )}
                                                         </ul>
+                                                        {(order.discount_amount ??
+                                                            0) > 0 && (
+                                                            <div className="mt-3 space-y-1 border-t border-[#A88B54]/20 pt-3 font-sans text-xs">
+                                                                <div className="flex justify-between text-emerald-700">
+                                                                    <span>
+                                                                        Diskon
+                                                                        Promo
+                                                                        {order.promo_code
+                                                                            ? ` (${order.promo_code})`
+                                                                            : order.promo_name
+                                                                              ? ` (${order.promo_name})`
+                                                                              : ''}
+                                                                    </span>
+                                                                    <span className="font-semibold">
+                                                                        -
+                                                                        {formatRupiah(
+                                                                            order.discount_amount ??
+                                                                                0,
+                                                                        )}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex justify-between font-semibold text-[#16233B]">
+                                                                    <span>
+                                                                        Total
+                                                                        Pembayaran
+                                                                    </span>
+                                                                    <span className="font-serif text-sm">
+                                                                        {formatRupiah(
+                                                                            order.total_amount,
+                                                                        )}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>

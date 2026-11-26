@@ -2,7 +2,7 @@ import { Head } from '@inertiajs/react';
 import { lazy, Suspense } from 'react';
 import { MotionConfig } from 'motion/react';
 import type { GroupedLandingContent } from '@/components/landing/cms';
-import type { Product } from '@/types/product';
+import type { Product, PublicPromotion } from '@/types/product';
 
 // ── Above-the-fold — eager import (LCP critical path) ────────────────────────
 import HeroSection from '@/components/landing/HeroSection';
@@ -42,6 +42,7 @@ export interface PartnerItem {
 export interface WelcomeProps {
     products?: Product[];
     categories?: string[];
+    activePromotions?: PublicPromotion[];
     partners?: PartnerItem[];
     contents?: GroupedLandingContent;
 }
@@ -59,6 +60,7 @@ function SectionSkeleton({
 export default function Welcome({
     products = [],
     categories = [],
+    activePromotions = [],
     partners = [],
     contents = {},
 }: WelcomeProps) {
@@ -92,6 +94,7 @@ export default function Welcome({
                     <CatalogSection
                         products={products}
                         categories={categories}
+                        activePromotions={activePromotions}
                         content={contents.catalog}
                     />
                 </Suspense>

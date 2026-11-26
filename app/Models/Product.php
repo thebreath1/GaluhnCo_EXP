@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 /**
@@ -59,6 +60,14 @@ class Product extends Model
                 $product->slug = Str::slug($product->name);
             }
         });
+    }
+
+    /**
+     * @return BelongsToMany<Promotion, $this>
+     */
+    public function promotions(): BelongsToMany
+    {
+        return $this->belongsToMany(Promotion::class, 'promotion_product');
     }
 
     /**
