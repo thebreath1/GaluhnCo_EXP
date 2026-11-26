@@ -73,7 +73,7 @@ export default function Navbar() {
             loading="eager"
             decoding="async"
             fetchPriority="high"
-            className="pointer-events-none max-h-10 max-w-full object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)] sm:max-h-11"
+            className="pointer-events-none max-h-10 max-w-full object-contain sm:max-h-11"
         />
     );
 
@@ -82,10 +82,11 @@ export default function Navbar() {
             {/* ── Main Floating Pill Glass Container ────────────────────────────── */}
             <nav
                 aria-label="Navigasi Utama"
-                className={`pointer-events-auto mx-auto flex h-[64px] max-w-6xl items-center justify-between rounded-full px-5 transition-all duration-300 sm:px-7 ${isScrolled
-                        ? 'border border-[#A88B54]/40 bg-[#16233B]/95 shadow-[0_8px_30px_rgba(22,35,59,0.25)] backdrop-blur-xl'
-                        : 'border border-[#A88B54]/35 bg-[#16233B]/65 shadow-[0_8px_32px_rgba(0,0,0,0.28)] backdrop-blur-xl'
-                    }`}
+                className={`pointer-events-auto mx-auto flex h-[64px] max-w-6xl items-center justify-between rounded-full px-5 ring-1 ring-white/45 transition-all duration-300 ring-inset sm:px-7 ${
+                    isScrolled
+                        ? 'border border-[#A88B54]/35 bg-[#FAF7F0]/75 shadow-[0_10px_34px_rgba(22,35,59,0.14)] backdrop-blur-xl backdrop-saturate-150'
+                        : 'border border-white/45 bg-white/55 shadow-[0_8px_32px_rgba(15,23,42,0.14)] backdrop-blur-xl backdrop-saturate-150'
+                }`}
             >
                 {/* 1. Kiri: Logo GALUH & CO. */}
                 {isHomePage ? (
@@ -113,7 +114,7 @@ export default function Navbar() {
                             key={link.href}
                             href={resolveNavHref(link.href)}
                             onClick={(e) => handleNavClick(e, link.href)}
-                            className="group relative py-1 font-sans text-xs font-medium tracking-wider text-[#F2EBDC]/90 uppercase transition-colors duration-200 hover:text-[#F2EBDC]"
+                            className="group relative py-1 font-sans text-xs font-semibold tracking-wider text-[#16233B]/85 uppercase transition-colors duration-200 hover:text-[#16233B]"
                         >
                             <span>{link.label}</span>
                             <span className="absolute bottom-0 left-0 h-[1.5px] w-0 bg-[#A88B54] transition-all duration-300 group-hover:w-full" />
@@ -122,7 +123,7 @@ export default function Navbar() {
 
                     <Link
                         href={B2BCustomizerController.index()}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-[#A88B54]/50 bg-[#A88B54]/15 px-3 py-1 font-sans text-[11px] font-semibold tracking-wider text-[#F2EBDC] uppercase transition-colors hover:bg-[#A88B54]/30"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-[#A88B54]/55 bg-[#A88B54]/15 px-3 py-1 font-sans text-[11px] font-semibold tracking-wider text-[#16233B] uppercase transition-colors hover:bg-[#A88B54]/30"
                     >
                         <SparklesIcon className="size-3 text-[#A88B54]" />
                         <span>3D Customizer</span>
@@ -134,9 +135,9 @@ export default function Navbar() {
                     <Link
                         href={cartHref}
                         aria-label="Keranjang Belanja"
-                        className="relative inline-flex size-9 items-center justify-center rounded-full border border-[#A88B54]/35 bg-[#F2EBDC]/10 text-[#F2EBDC] transition-colors hover:border-[#A88B54] hover:bg-[#F2EBDC]/20"
+                        className="relative inline-flex size-9 items-center justify-center rounded-full border border-[#16233B]/20 bg-white/50 text-[#16233B] transition-colors hover:border-[#A88B54] hover:bg-white/80"
                     >
-                        <ShoppingBagIcon className="size-4 text-[#F2EBDC]" />
+                        <ShoppingBagIcon className="size-4 text-[#16233B]" />
                         {cartCount > 0 && (
                             <span className="py-0.2 absolute -top-1 -right-1 flex min-w-[18px] items-center justify-center rounded-full bg-[#A88B54] px-1 font-sans text-[10px] font-bold text-[#16233B] shadow-xs">
                                 {cartCount > 99 ? '99+' : cartCount}
@@ -146,12 +147,9 @@ export default function Navbar() {
 
                     <Link
                         href={accountHref}
-                        className={`hidden items-center gap-1.5 rounded-full px-4 py-2 font-sans text-xs font-semibold tracking-wide transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] sm:inline-flex ${isScrolled
-                                ? 'bg-[#F2EBDC] text-[#16233B] hover:bg-white'
-                                : 'bg-[#A88B54] text-[#16233B] hover:bg-[#B89B64]'
-                            }`}
+                        className="hidden items-center gap-1.5 rounded-full bg-[#16233B] px-4 py-2 font-sans text-xs font-semibold tracking-wide text-[#F2EBDC] transition-all duration-300 hover:scale-[1.02] hover:bg-[#1F304F] active:scale-[0.98] sm:inline-flex"
                     >
-                        <UserIcon className="size-3.5" />
+                        <UserIcon className="size-3.5 text-[#A88B54]" />
                         <span>{user ? 'Akun Saya' : 'Masuk'}</span>
                     </Link>
 
@@ -160,7 +158,7 @@ export default function Navbar() {
                         type="button"
                         aria-label="Buka menu navigasi"
                         onClick={() => setMobileOpen((prev) => !prev)}
-                        className="flex size-9 items-center justify-center rounded-full text-[#F2EBDC] transition-colors hover:bg-[#F2EBDC]/10 lg:hidden"
+                        className="flex size-9 items-center justify-center rounded-full text-[#16233B] transition-colors hover:bg-[#16233B]/10 lg:hidden"
                     >
                         {mobileOpen ? (
                             <XIcon className="size-5" />
@@ -179,7 +177,7 @@ export default function Navbar() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
                         transition={{ duration: 0.25, ease: 'easeOut' }}
-                        className="pointer-events-auto mx-auto mt-2 max-w-6xl rounded-3xl border border-[#A88B54]/35 bg-[#16233B]/95 p-6 shadow-2xl backdrop-blur-xl lg:hidden"
+                        className="pointer-events-auto mx-auto mt-2 max-w-6xl rounded-3xl border border-white/50 bg-[#FAF7F0]/85 p-6 shadow-2xl ring-1 ring-white/40 backdrop-blur-2xl backdrop-saturate-150 ring-inset lg:hidden"
                     >
                         <div className="flex flex-col space-y-4">
                             <div className="flex items-center justify-between border-b border-[#A88B54]/25 pb-3">
@@ -203,7 +201,7 @@ export default function Navbar() {
                                         onClick={(e) =>
                                             handleNavClick(e, link.href)
                                         }
-                                        className="py-3 font-serif text-lg font-normal tracking-normal text-[#F2EBDC] transition-colors hover:text-[#A88B54]"
+                                        className="py-3 font-serif text-lg font-normal tracking-normal text-[#16233B] transition-colors hover:text-[#A88B54]"
                                     >
                                         {link.label}
                                     </a>
@@ -211,10 +209,10 @@ export default function Navbar() {
                                 <Link
                                     href={B2BCustomizerController.index()}
                                     onClick={() => setMobileOpen(false)}
-                                    className="flex items-center justify-between py-3 font-serif text-lg font-normal text-[#A88B54]"
+                                    className="flex items-center justify-between py-3 font-serif text-lg font-normal text-[#16233B] hover:text-[#A88B54]"
                                 >
                                     <span>3D Gift Box Customizer</span>
-                                    <SparklesIcon className="size-4" />
+                                    <SparklesIcon className="size-4 text-[#A88B54]" />
                                 </Link>
                             </div>
 
@@ -222,7 +220,7 @@ export default function Navbar() {
                                 <Link
                                     href={cartHref}
                                     onClick={() => setMobileOpen(false)}
-                                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#F2EBDC] py-3 font-sans text-xs font-semibold tracking-wide text-[#16233B] transition-colors hover:bg-white"
+                                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#A88B54]/45 bg-white/70 py-3 font-sans text-xs font-semibold tracking-wide text-[#16233B] transition-colors hover:bg-white"
                                 >
                                     <ShoppingBagIcon className="size-4" />
                                     Keranjang Belanja
@@ -232,7 +230,7 @@ export default function Navbar() {
                                 <Link
                                     href={accountHref}
                                     onClick={() => setMobileOpen(false)}
-                                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#A88B54] bg-[#A88B54]/15 py-3 font-sans text-xs font-medium tracking-wide text-[#F2EBDC] transition-colors hover:bg-[#A88B54]/25"
+                                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#16233B] py-3 font-sans text-xs font-semibold tracking-wide text-[#F2EBDC] transition-colors hover:bg-[#1F304F]"
                                 >
                                     <UserIcon className="size-4 text-[#A88B54]" />
                                     {user ? 'Akun Saya' : 'Masuk / Daftar'}

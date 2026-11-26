@@ -1,6 +1,11 @@
 import { Link, usePage } from '@inertiajs/react';
 import type { Variants } from 'motion/react';
-import { motion, useInView, useReducedMotion } from 'motion/react';
+import {
+    AnimatePresence,
+    motion,
+    useInView,
+    useReducedMotion,
+} from 'motion/react';
 import { ArrowRightIcon, SparklesIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import B2BCustomizerController from '@/actions/App/Http/Controllers/B2BCustomizerController';
@@ -322,20 +327,37 @@ function SeasonalOrnament({ theme }: { theme: SeasonThemeKey }) {
     );
 }
 
+const SPLASH_PARTICLES = [
+    { left: '12%', top: '18%', size: 3, delay: 0.1, duration: 3.4 },
+    { left: '24%', top: '72%', size: 2, delay: 0.5, duration: 4.1 },
+    { left: '32%', top: '28%', size: 2.5, delay: 0.9, duration: 3.8 },
+    { left: '44%', top: '14%', size: 2, delay: 0.3, duration: 4.3 },
+    { left: '58%', top: '82%', size: 3, delay: 0.7, duration: 3.6 },
+    { left: '68%', top: '22%', size: 2.5, delay: 0.2, duration: 4.0 },
+    { left: '78%', top: '66%', size: 3, delay: 0.8, duration: 3.5 },
+    { left: '86%', top: '34%', size: 2, delay: 0.4, duration: 4.2 },
+    { left: '18%', top: '48%', size: 2, delay: 1.1, duration: 3.9 },
+    { left: '82%', top: '84%', size: 2.5, delay: 0.6, duration: 3.7 },
+    { left: '38%', top: '86%', size: 2, delay: 1.0, duration: 4.4 },
+    { left: '62%', top: '12%', size: 2, delay: 0.4, duration: 3.9 },
+    { left: '9%', top: '80%', size: 2.5, delay: 0.7, duration: 4.1 },
+    { left: '91%', top: '16%', size: 2.5, delay: 0.2, duration: 3.5 },
+] as const;
+
 const staggerContainer: Variants = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,
-        transition: { staggerChildren: 0.1, delayChildren: 0.08 },
+        transition: { staggerChildren: 0.13, delayChildren: 0.32 },
     },
 };
 
 const fadeUpChild: Variants = {
-    hidden: { opacity: 0, y: 18 },
+    hidden: { opacity: 0, y: 56 },
     visible: {
         opacity: 1,
         y: 0,
-        transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as const },
+        transition: { duration: 0.85, ease: [0.16, 1, 0.3, 1] as const },
     },
 };
 
@@ -345,6 +367,45 @@ export default function HeroSection({
 }: HeroSectionProps) {
     const shouldReduceMotion = useReducedMotion() ?? false;
     const { seasonalRibbon } = usePage<SharedPageProps>().props;
+    const [showSplash, setShowSplash] = useState(true);
+    const [heroRevealed, setHeroRevealed] = useState(false);
+
+    useEffect(() => {
+        if (shouldReduceMotion || window.location.hash !== '') {
+            setShowSplash(false);
+            setHeroRevealed(true);
+            return;
+        }
+
+        const revealTimer = window.setTimeout(() => {
+            setShowSplash(false);
+            setHeroRevealed(true);
+        }, 2100);
+
+        const handleSkip = () => {
+            setShowSplash(false);
+            setHeroRevealed(true);
+        };
+
+        window.addEventListener('keydown', handleSkip, { once: true });
+
+        return () => {
+            window.clearTimeout(revealTimer);
+            window.removeEventListener('keydown', handleSkip);
+        };
+    }, [shouldReduceMotion]);
+
+    useEffect(() => {
+        if (showSplash && !shouldReduceMotion) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [showSplash, shouldReduceMotion]);
 
     const seasonThemeKey = resolveSeasonTheme(
         getCmsText(content, 'hero_season_theme', 'ramadan'),
@@ -400,7 +461,7 @@ export default function HeroSection({
         eraseSpeed: 50,
         pauseAfterType: 2400,
         pauseAfterErase: 380,
-        active: inView,
+        active: inView && heroRevealed,
         reducedMotion: shouldReduceMotion,
     });
 
@@ -459,6 +520,104 @@ export default function HeroSection({
 
     return (
         <section className="relative flex min-h-[92vh] flex-col justify-between overflow-hidden bg-[#16233B] text-[#F2EBDC]">
+            {/* ── 0. Intro Splash Screen (Logo & Galuh & Co. di Tengah) ── */}
+            <AnimatePresence>
+                {showSplash && !shouldReduceMotion && (
+                    <motion.div
+                        key="hero-intro-splash"
+                        initial={{ y: '0%' }}
+                        exit={{
+                            y: '-100%',
+                            transition: {
+                                duration: 1.0,
+                                delay: 0.12,
+                                ease: [0.22, 1, 0.36, 1] as const,
+                            },
+                        }}
+                        onClick={() => {
+                            setShowSplash(false);
+                            setHeroRevealed(true);
+                        }}
+                        className="fixed inset-0 z-[60] flex cursor-pointer flex-col items-center justify-center overflow-hidden border-b border-[#A88B54]/30 bg-[#16233B] px-6 text-[#F2EBDC] shadow-[0_24px_60px_rgba(10,16,28,0.55)] will-change-transform"
+                        aria-label="Pembukaan Galuh & Co."
+                    >
+                        {/* Atmospheric radial glow */}
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-0"
+                            style={{
+                                background:
+                                    'radial-gradient(circle at 50% 48%, rgba(168,139,84,0.16) 0%, rgba(30,47,77,0.55) 35%, rgba(22,35,59,0) 70%)',
+                            }}
+                        />
+
+                        {/* Partikel halus mengambang */}
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-0"
+                        >
+                            {SPLASH_PARTICLES.map((particle, idx) => (
+                                <motion.span
+                                    key={idx}
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{
+                                        opacity: [0.15, 0.75, 0.25],
+                                        y: [-6, 6, -6],
+                                    }}
+                                    transition={{
+                                        duration: particle.duration,
+                                        delay: particle.delay,
+                                        repeat: Infinity,
+                                        ease: 'easeInOut',
+                                    }}
+                                    style={{
+                                        left: particle.left,
+                                        top: particle.top,
+                                        width: particle.size,
+                                        height: particle.size,
+                                    }}
+                                    className="absolute rounded-full bg-[#A88B54]"
+                                />
+                            ))}
+                        </div>
+
+                        {/* Logo & Teks Galuh & Co. di Tengah */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.94, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{
+                                opacity: 0,
+                                y: -28,
+                                transition: {
+                                    duration: 0.45,
+                                    ease: [0.16, 1, 0.3, 1] as const,
+                                },
+                            }}
+                            transition={{
+                                duration: 0.75,
+                                ease: [0.16, 1, 0.3, 1] as const,
+                            }}
+                            className="relative z-10 flex flex-col items-center text-center"
+                        >
+                            <img
+                                src="/asset/logo/Logo_galu&co.png"
+                                alt="Galuh & Co."
+                                loading="eager"
+                                decoding="async"
+                                className="h-20 w-auto object-contain drop-shadow-[0_10px_28px_rgba(168,139,84,0.28)] sm:h-24"
+                            />
+                            <h2 className="mt-4 font-serif text-3xl font-normal tracking-[0.08em] text-[#F2EBDC] sm:text-4xl">
+                                Galuh &amp; Co.
+                            </h2>
+                            <div className="mt-3 h-px w-16 bg-gradient-to-r from-transparent via-[#A88B54] to-transparent" />
+                            <p className="mt-2.5 font-sans text-[11px] font-semibold tracking-[0.28em] text-[#A88B54] uppercase">
+                                Curated Luxury Hampers
+                            </p>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* ── 1. Atmospheric Dark Navy & Brass Radial Glows ── */}
             <div
                 aria-hidden="true"
@@ -489,7 +648,13 @@ export default function HeroSection({
                             shouldReduceMotion ? undefined : staggerContainer
                         }
                         initial={shouldReduceMotion ? undefined : 'hidden'}
-                        animate={shouldReduceMotion ? undefined : 'visible'}
+                        animate={
+                            shouldReduceMotion
+                                ? undefined
+                                : heroRevealed
+                                  ? 'visible'
+                                  : 'hidden'
+                        }
                         className="flex flex-col items-start text-left lg:col-span-6"
                     >
                         {/* Single Dynamic Seasonal Eyebrow Pill */}
@@ -645,7 +810,30 @@ export default function HeroSection({
                     </motion.div>
 
                     {/* Kolom Kanan: Transparent Cutout Parcel Showcase Tanpa Bingkai Kartu */}
-                    <div className="relative flex items-center justify-center lg:col-span-6">
+                    <motion.div
+                        initial={
+                            shouldReduceMotion
+                                ? undefined
+                                : { opacity: 0, y: 64 }
+                        }
+                        animate={
+                            shouldReduceMotion
+                                ? undefined
+                                : heroRevealed
+                                  ? { opacity: 1, y: 0 }
+                                  : { opacity: 0, y: 64 }
+                        }
+                        transition={
+                            shouldReduceMotion
+                                ? undefined
+                                : {
+                                      duration: 0.95,
+                                      delay: 0.38,
+                                      ease: [0.16, 1, 0.3, 1] as const,
+                                  }
+                        }
+                        className="relative flex items-center justify-center lg:col-span-6"
+                    >
                         {/* Radial Ambient Glow di Belakang Parsel */}
                         <div
                             aria-hidden="true"
@@ -670,11 +858,13 @@ export default function HeroSection({
                                 animate={
                                     shouldReduceMotion
                                         ? undefined
-                                        : {
-                                              opacity: 1,
-                                              scale: 1,
-                                              y: [0, -10, 0],
-                                          }
+                                        : heroRevealed
+                                          ? {
+                                                opacity: 1,
+                                                scale: 1,
+                                                y: [0, -10, 0],
+                                            }
+                                          : { opacity: 0, scale: 0.94, y: 12 }
                                 }
                                 transition={
                                     shouldReduceMotion
@@ -705,12 +895,32 @@ export default function HeroSection({
                                 />
                             </motion.div>
                         </Link>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
 
             {/* ── 4. Luxury Promo Marquee di Bawah Hero ── */}
-            <PromoMarquee itemsRaw={content?.promo_marquee_items} />
+            <motion.div
+                initial={shouldReduceMotion ? undefined : { opacity: 0, y: 40 }}
+                animate={
+                    shouldReduceMotion
+                        ? undefined
+                        : heroRevealed
+                          ? { opacity: 1, y: 0 }
+                          : { opacity: 0, y: 40 }
+                }
+                transition={
+                    shouldReduceMotion
+                        ? undefined
+                        : {
+                              duration: 0.85,
+                              delay: 0.4,
+                              ease: [0.16, 1, 0.3, 1] as const,
+                          }
+                }
+            >
+                <PromoMarquee itemsRaw={content?.promo_marquee_items} />
+            </motion.div>
         </section>
     );
 }
