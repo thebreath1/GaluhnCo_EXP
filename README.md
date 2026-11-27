@@ -1,6 +1,1 @@
-<<<<<<< HEAD
-"# Galuh-co"
-=======
-# GaluhnCo
-team
->>>>>>> 4174ae0ada5729b30be82fd50337d27875784d9c
+Fork khusus yang dibuat untuk bereksperimen dengan aplikasi Galuh & Co.
