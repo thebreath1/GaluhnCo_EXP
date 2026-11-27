@@ -3,10 +3,10 @@ import { AnimatePresence, motion, MotionConfig } from 'motion/react';
 import {
     CheckIcon,
     ChevronDownIcon,
-    EyeIcon,
     GiftIcon,
     MinusIcon,
     PlusIcon,
+    ScrollTextIcon,
     SearchIcon,
     ShoppingBagIcon,
     SparklesIcon,
@@ -688,7 +688,7 @@ export default function KatalogPage({
                                                             }
                                                             className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border border-[#A88B54] bg-transparent py-2 text-center font-sans text-xs font-medium text-[#16233B] transition-colors hover:bg-[#A88B54]/12"
                                                         >
-                                                            <EyeIcon className="size-3.5 text-[#A88B54]" />
+                                                            <ScrollTextIcon className="size-3.5 text-[#A88B54]" />
                                                             Detail Isi
                                                         </button>
 

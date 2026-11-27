@@ -3,10 +3,10 @@ import { AnimatePresence, motion } from 'motion/react';
 import {
     CheckIcon,
     ChevronDownIcon,
-    EyeIcon,
     GiftIcon,
     MinusIcon,
     PlusIcon,
+    ScrollTextIcon,
     ShoppingBagIcon,
     SparklesIcon,
     StarIcon,
@@ -86,14 +86,14 @@ export default function CatalogSection({
         featuredCategory && featuredCategory.trim() !== ''
             ? featuredCategory.trim()
             : (allCategoryOptions.find(
-                  (cat) => cat.toLowerCase() === 'seasonal & festive',
-              ) ??
-              allCategoryOptions.find((cat) =>
-                  SEASONAL_KEYWORDS.some((kw) =>
-                      cat.toLowerCase().includes(kw),
-                  ),
-              ) ??
-              'Seasonal & Festive');
+                (cat) => cat.toLowerCase() === 'seasonal & festive',
+            ) ??
+                allCategoryOptions.find((cat) =>
+                    SEASONAL_KEYWORDS.some((kw) =>
+                        cat.toLowerCase().includes(kw),
+                    ),
+                ) ??
+                'Seasonal & Festive');
 
     const otherCategories = allCategoryOptions.filter(
         (cat) => cat.toLowerCase() !== activeSeasonCategory.toLowerCase(),
@@ -273,11 +273,10 @@ export default function CatalogSection({
                                     setOnlyBestSeller(false);
                                     setIsDropdownOpen(false);
                                 }}
-                                className={`inline-flex items-center rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
-                                    isAllActive
-                                        ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-sm'
-                                        : 'border-[#16233B]/15 bg-white text-[#16233B] hover:border-[#A88B54]'
-                                }`}
+                                className={`inline-flex items-center rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${isAllActive
+                                    ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-sm'
+                                    : 'border-[#16233B]/15 bg-white text-[#16233B] hover:border-[#A88B54]'
+                                    }`}
                             >
                                 Semua
                             </button>
@@ -289,11 +288,10 @@ export default function CatalogSection({
                                     setActiveCategory(activeSeasonCategory);
                                     setIsDropdownOpen(false);
                                 }}
-                                className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
-                                    isSeasonActive
-                                        ? 'border-[#A88B54]/60 bg-[#16233B] text-[#F2EBDC] shadow-sm'
-                                        : 'border-[#A88B54]/50 bg-[#FAF7F0] text-[#16233B] hover:border-[#A88B54] hover:bg-[#A88B54]/10'
-                                }`}
+                                className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${isSeasonActive
+                                    ? 'border-[#A88B54]/60 bg-[#16233B] text-[#F2EBDC] shadow-sm'
+                                    : 'border-[#A88B54]/50 bg-[#FAF7F0] text-[#16233B] hover:border-[#A88B54] hover:bg-[#A88B54]/10'
+                                    }`}
                             >
                                 <SparklesIcon className="size-3.5 text-[#A88B54]" />
                                 {activeSeasonCategory}
@@ -306,18 +304,16 @@ export default function CatalogSection({
                                     setOnlyBestSeller((prev) => !prev);
                                     setIsDropdownOpen(false);
                                 }}
-                                className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
-                                    onlyBestSeller
-                                        ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-sm'
-                                        : 'border-[#16233B]/15 bg-white text-[#16233B] hover:border-[#A88B54]'
-                                }`}
+                                className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${onlyBestSeller
+                                    ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-sm'
+                                    : 'border-[#16233B]/15 bg-white text-[#16233B] hover:border-[#A88B54]'
+                                    }`}
                             >
                                 <StarIcon
-                                    className={`size-3.5 ${
-                                        onlyBestSeller
-                                            ? 'fill-[#A88B54] text-[#A88B54]'
-                                            : 'text-[#A88B54]'
-                                    }`}
+                                    className={`size-3.5 ${onlyBestSeller
+                                        ? 'fill-[#A88B54] text-[#A88B54]'
+                                        : 'text-[#A88B54]'
+                                        }`}
                                 />
                                 Best Seller
                             </button>
@@ -331,11 +327,10 @@ export default function CatalogSection({
                                     onClick={() =>
                                         setIsDropdownOpen((prev) => !prev)
                                     }
-                                    className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${
-                                        isOtherCategoryActive
-                                            ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-sm'
-                                            : 'border-[#16233B]/15 bg-white text-[#16233B] hover:border-[#A88B54]'
-                                    }`}
+                                    className={`inline-flex items-center gap-1.5 rounded-full border px-5 py-2 font-sans text-xs font-medium tracking-wide transition-all duration-300 ${isOtherCategoryActive
+                                        ? 'border-[#16233B] bg-[#16233B] text-[#F2EBDC] shadow-sm'
+                                        : 'border-[#16233B]/15 bg-white text-[#16233B] hover:border-[#A88B54]'
+                                        }`}
                                 >
                                     <span>
                                         {isOtherCategoryActive
@@ -343,13 +338,11 @@ export default function CatalogSection({
                                             : 'Kategori Lainnya'}
                                     </span>
                                     <ChevronDownIcon
-                                        className={`size-3.5 transition-transform duration-200 ${
-                                            isDropdownOpen ? 'rotate-180' : ''
-                                        } ${
-                                            isOtherCategoryActive
+                                        className={`size-3.5 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''
+                                            } ${isOtherCategoryActive
                                                 ? 'text-[#A88B54]'
                                                 : 'text-[#6E675D]'
-                                        }`}
+                                            }`}
                                     />
                                 </button>
 
@@ -406,11 +399,10 @@ export default function CatalogSection({
                                                                             false,
                                                                         );
                                                                     }}
-                                                                    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left font-sans text-xs font-medium transition-colors ${
-                                                                        isSelected
-                                                                            ? 'bg-[#16233B] text-[#F2EBDC]'
-                                                                            : 'text-[#16233B] hover:bg-[#F2EBDC]'
-                                                                    }`}
+                                                                    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left font-sans text-xs font-medium transition-colors ${isSelected
+                                                                        ? 'bg-[#16233B] text-[#F2EBDC]'
+                                                                        : 'text-[#16233B] hover:bg-[#F2EBDC]'
+                                                                        }`}
                                                                 >
                                                                     <span>
                                                                         {
@@ -544,8 +536,7 @@ export default function CatalogSection({
                                             )}
                                             {product.active_promo && (
                                                 <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full bg-[#A88B54] px-2.5 py-0.5 font-sans text-[10px] font-bold tracking-wider text-[#16233B] uppercase shadow-sm">
-                                                    {product.active_promo
-                                                        .badge_text
+                                                    {product.active_promo.badge_text
                                                         ? `${product.active_promo.badge_text} · ${product.active_promo.discount_label}`
                                                         : `PROMO ${product.active_promo.discount_label}`}
                                                 </span>
@@ -560,25 +551,25 @@ export default function CatalogSection({
                                                 </h3>
                                                 {(product.event_category ||
                                                     product.season_tag) && (
-                                                    <div className="mt-1 flex flex-wrap gap-1.5">
-                                                        {product.event_category &&
-                                                            product.event_category !==
+                                                        <div className="mt-1 flex flex-wrap gap-1.5">
+                                                            {product.event_category &&
+                                                                product.event_category !==
                                                                 'All Occasion' && (
-                                                                <span className="rounded-md bg-[#16233B]/8 px-2 py-0.5 font-sans text-[10px] font-medium text-[#16233B]">
+                                                                    <span className="rounded-md bg-[#16233B]/8 px-2 py-0.5 font-sans text-[10px] font-medium text-[#16233B]">
+                                                                        {
+                                                                            product.event_category
+                                                                        }
+                                                                    </span>
+                                                                )}
+                                                            {product.season_tag && (
+                                                                <span className="rounded-md border border-[#A88B54]/30 px-2 py-0.5 font-sans text-[10px] font-medium text-[#6E675D]">
                                                                     {
-                                                                        product.event_category
+                                                                        product.season_tag
                                                                     }
                                                                 </span>
                                                             )}
-                                                        {product.season_tag && (
-                                                            <span className="rounded-md border border-[#A88B54]/30 px-2 py-0.5 font-sans text-[10px] font-medium text-[#6E675D]">
-                                                                {
-                                                                    product.season_tag
-                                                                }
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                )}
+                                                        </div>
+                                                    )}
                                                 <p className="mt-1.5 line-clamp-2 font-sans text-xs leading-relaxed font-normal text-[#6E675D]">
                                                     {product.short_description}
                                                 </p>
@@ -587,8 +578,8 @@ export default function CatalogSection({
                                             <div className="mt-4">
                                                 {/* Harga Mulai */}
                                                 {product.active_promo &&
-                                                (product.discounted_price ??
-                                                    product.price_from) <
+                                                    (product.discounted_price ??
+                                                        product.price_from) <
                                                     product.price_from ? (
                                                     <div className="space-y-0.5">
                                                         <div className="flex items-center gap-1.5">
@@ -612,7 +603,7 @@ export default function CatalogSection({
                                                             <span className="font-serif text-base font-semibold text-[#16233B]">
                                                                 {formatRupiah(
                                                                     product.discounted_price ??
-                                                                        product.price_from,
+                                                                    product.price_from,
                                                                 )}
                                                             </span>
                                                         </div>
@@ -641,7 +632,7 @@ export default function CatalogSection({
                                                         }
                                                         className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-[#A88B54] bg-transparent py-2 font-sans text-xs font-medium text-[#16233B] transition-colors hover:bg-[#A88B54]/12"
                                                     >
-                                                        <EyeIcon className="size-3.5 text-[#A88B54]" />
+                                                        <ScrollTextIcon className="size-3.5 text-[#A88B54]" />
                                                         Detail
                                                     </button>
                                                     <button
@@ -661,7 +652,7 @@ export default function CatalogSection({
                                                     >
                                                         <ShoppingBagIcon className="size-3.5 text-[#A88B54]" />
                                                         {addingProductId ===
-                                                        product.id
+                                                            product.id
                                                             ? 'Menambah...'
                                                             : 'Keranjang'}
                                                     </button>
@@ -760,14 +751,14 @@ export default function CatalogSection({
                                         </h3>
 
                                         {selectedProduct.active_promo &&
-                                        (selectedProduct.discounted_price ??
-                                            selectedProduct.price_from) <
+                                            (selectedProduct.discounted_price ??
+                                                selectedProduct.price_from) <
                                             selectedProduct.price_from ? (
                                             <div className="mt-2 flex flex-wrap items-baseline gap-2">
                                                 <span className="font-serif text-lg font-semibold text-[#16233B]">
                                                     {formatRupiah(
                                                         selectedProduct.discounted_price ??
-                                                            selectedProduct.price_from,
+                                                        selectedProduct.price_from,
                                                     )}
                                                 </span>
                                                 <span className="font-sans text-xs text-[#6E675D] line-through">
@@ -808,8 +799,8 @@ export default function CatalogSection({
                                             </h4>
                                             <ul className="mt-3 space-y-2">
                                                 {selectedProduct.contents &&
-                                                selectedProduct.contents
-                                                    .length > 0 ? (
+                                                    selectedProduct.contents
+                                                        .length > 0 ? (
                                                     selectedProduct.contents.map(
                                                         (item, idx) => (
                                                             <li
@@ -888,7 +879,7 @@ export default function CatalogSection({
                                         >
                                             <ShoppingBagIcon className="size-4 text-[#A88B54]" />
                                             {addingProductId ===
-                                            selectedProduct.id
+                                                selectedProduct.id
                                                 ? 'Menambahkan...'
                                                 : `Tambah ke Keranjang (${formatRupiah((selectedProduct.discounted_price ?? selectedProduct.price_from) * modalQuantity)})`}
                                         </button>

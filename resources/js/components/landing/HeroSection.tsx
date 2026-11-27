@@ -190,7 +190,7 @@ function SeasonalOrnament({ theme }: { theme: SeasonThemeKey }) {
                 aria-hidden="true"
                 viewBox="0 0 420 420"
                 fill="none"
-                className="pointer-events-none absolute inset-0 m-auto size-[340px] text-[#A88B54] opacity-25 sm:size-[420px]"
+                className="pointer-events-none absolute inset-0 m-auto size-[260px] text-[#A88B54] opacity-25 sm:size-[380px] lg:size-[420px]"
             >
                 <circle
                     cx="210"
@@ -227,7 +227,7 @@ function SeasonalOrnament({ theme }: { theme: SeasonThemeKey }) {
                 aria-hidden="true"
                 viewBox="0 0 420 420"
                 fill="none"
-                className="pointer-events-none absolute inset-0 m-auto size-[340px] text-[#A88B54] opacity-25 sm:size-[420px]"
+                className="pointer-events-none absolute inset-0 m-auto size-[260px] text-[#A88B54] opacity-25 sm:size-[380px] lg:size-[420px]"
             >
                 <circle
                     cx="210"
@@ -259,7 +259,7 @@ function SeasonalOrnament({ theme }: { theme: SeasonThemeKey }) {
                 aria-hidden="true"
                 viewBox="0 0 420 420"
                 fill="none"
-                className="pointer-events-none absolute inset-0 m-auto size-[340px] text-[#A88B54] opacity-25 sm:size-[420px]"
+                className="pointer-events-none absolute inset-0 m-auto size-[260px] text-[#A88B54] opacity-25 sm:size-[380px] lg:size-[420px]"
             >
                 <circle
                     cx="210"
@@ -639,10 +639,10 @@ export default function HeroSection({
                 }}
             />
 
-            {/* ── 3. Split Hero Main Area (2 Kolom) ── */}
+            {/* ── 3. Split Hero Main Area (2 Kolom Desktop, Copy → Foto → CTA di Mobile) ── */}
             <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 items-center px-6 pt-28 pb-10 sm:pt-32 md:pb-14">
-                <div className="grid w-full grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-8">
-                    {/* Kolom Kiri: Editorial Copy & CTA */}
+                <div className="grid w-full grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-x-8 lg:gap-y-0">
+                    {/* Bagian 1: Editorial Copy (Kiri Atas di Desktop, Pertama di Mobile) */}
                     <motion.div
                         variants={
                             shouldReduceMotion ? undefined : staggerContainer
@@ -655,7 +655,7 @@ export default function HeroSection({
                                   ? 'visible'
                                   : 'hidden'
                         }
-                        className="flex flex-col items-start text-left lg:col-span-6"
+                        className="order-1 flex flex-col items-start text-left lg:col-span-6 lg:col-start-1 lg:row-start-1 lg:self-end"
                     >
                         {/* Single Dynamic Seasonal Eyebrow Pill */}
                         <motion.div
@@ -760,56 +760,74 @@ export default function HeroSection({
                         >
                             {subtitleText}
                         </motion.p>
-
-                        {/* Dual CTAs */}
-                        <motion.div
-                            variants={
-                                shouldReduceMotion ? undefined : fadeUpChild
-                            }
-                            className="mt-8 flex w-full flex-col items-stretch gap-3.5 sm:w-auto sm:flex-row sm:items-center"
-                        >
-                            {primaryCtaLink.startsWith('#') ? (
-                                <a
-                                    href={primaryCtaLink}
-                                    onClick={(e) =>
-                                        handleSmoothScroll(e, primaryCtaLink)
-                                    }
-                                    className={primaryCtaClasses}
-                                >
-                                    <span>{primaryCtaText}</span>
-                                    <ArrowRightIcon className="size-4 text-[#16233B] transition-transform duration-300 group-hover:translate-x-0.5" />
-                                </a>
-                            ) : primaryCtaLink.startsWith('/') ? (
-                                <Link
-                                    href={primaryCtaLink}
-                                    className={primaryCtaClasses}
-                                >
-                                    <span>{primaryCtaText}</span>
-                                    <ArrowRightIcon className="size-4 text-[#16233B] transition-transform duration-300 group-hover:translate-x-0.5" />
-                                </Link>
-                            ) : (
-                                <a
-                                    href={primaryCtaLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={primaryCtaClasses}
-                                >
-                                    <span>{primaryCtaText}</span>
-                                    <ArrowRightIcon className="size-4 text-[#16233B] transition-transform duration-300 group-hover:translate-x-0.5" />
-                                </a>
-                            )}
-
-                            <Link
-                                href={B2BCustomizerController.index()}
-                                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#F2EBDC]/30 bg-transparent px-7 py-3.5 font-sans text-sm font-semibold tracking-wide text-[#F2EBDC] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#A88B54]/70 hover:bg-white/5 active:scale-[0.98] sm:w-auto sm:text-base"
-                            >
-                                <SparklesIcon className="size-4 text-[#A88B54]" />
-                                <span>Rancang Box 3D</span>
-                            </Link>
-                        </motion.div>
                     </motion.div>
 
-                    {/* Kolom Kanan: Transparent Cutout Parcel Showcase Tanpa Bingkai Kartu */}
+                    {/* Bagian 2: Dual CTAs (Kiri Bawah di Desktop, Setelah Foto di Mobile) */}
+                    <motion.div
+                        initial={
+                            shouldReduceMotion
+                                ? undefined
+                                : { opacity: 0, y: 56 }
+                        }
+                        animate={
+                            shouldReduceMotion
+                                ? undefined
+                                : heroRevealed
+                                  ? { opacity: 1, y: 0 }
+                                  : { opacity: 0, y: 56 }
+                        }
+                        transition={
+                            shouldReduceMotion
+                                ? undefined
+                                : {
+                                      duration: 0.85,
+                                      delay: 0.52,
+                                      ease: [0.16, 1, 0.3, 1] as const,
+                                  }
+                        }
+                        className="order-3 flex w-full flex-col items-stretch gap-3.5 sm:w-auto sm:flex-row sm:items-center lg:col-span-6 lg:col-start-1 lg:row-start-2 lg:mt-8 lg:self-start"
+                    >
+                        {primaryCtaLink.startsWith('#') ? (
+                            <a
+                                href={primaryCtaLink}
+                                onClick={(e) =>
+                                    handleSmoothScroll(e, primaryCtaLink)
+                                }
+                                className={primaryCtaClasses}
+                            >
+                                <span>{primaryCtaText}</span>
+                                <ArrowRightIcon className="size-4 text-[#16233B] transition-transform duration-300 group-hover:translate-x-0.5" />
+                            </a>
+                        ) : primaryCtaLink.startsWith('/') ? (
+                            <Link
+                                href={primaryCtaLink}
+                                className={primaryCtaClasses}
+                            >
+                                <span>{primaryCtaText}</span>
+                                <ArrowRightIcon className="size-4 text-[#16233B] transition-transform duration-300 group-hover:translate-x-0.5" />
+                            </Link>
+                        ) : (
+                            <a
+                                href={primaryCtaLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={primaryCtaClasses}
+                            >
+                                <span>{primaryCtaText}</span>
+                                <ArrowRightIcon className="size-4 text-[#16233B] transition-transform duration-300 group-hover:translate-x-0.5" />
+                            </a>
+                        )}
+
+                        <Link
+                            href={B2BCustomizerController.index()}
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#F2EBDC]/30 bg-transparent px-7 py-3.5 font-sans text-sm font-semibold tracking-wide text-[#F2EBDC] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#A88B54]/70 hover:bg-white/5 active:scale-[0.98] sm:w-auto sm:text-base"
+                        >
+                            <SparklesIcon className="size-4 text-[#A88B54]" />
+                            <span>Rancang Box 3D</span>
+                        </Link>
+                    </motion.div>
+
+                    {/* Bagian 3: Transparent Cutout Parcel Showcase (Kanan di Desktop, Tengah di Mobile) */}
                     <motion.div
                         initial={
                             shouldReduceMotion
@@ -832,12 +850,12 @@ export default function HeroSection({
                                       ease: [0.16, 1, 0.3, 1] as const,
                                   }
                         }
-                        className="relative flex items-center justify-center lg:col-span-6"
+                        className="relative order-2 flex items-center justify-center lg:col-span-6 lg:col-start-7 lg:row-span-2 lg:row-start-1"
                     >
                         {/* Radial Ambient Glow di Belakang Parsel */}
                         <div
                             aria-hidden="true"
-                            className="pointer-events-none absolute m-auto size-72 rounded-full bg-[#A88B54]/15 blur-3xl sm:size-96"
+                            className="pointer-events-none absolute m-auto size-64 rounded-full bg-[#A88B54]/15 blur-3xl sm:size-96"
                         />
 
                         {/* Ornamen Vektor Garis Tipis Emas Minimal Sesuai Musim */}
@@ -847,7 +865,7 @@ export default function HeroSection({
                         <Link
                             href={B2BCustomizerController.index()}
                             aria-label="Rancang Box 3D di Studio Customizer Galuh & Co."
-                            className="group relative z-10 block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#A88B54]"
+                            className="group relative z-10 block w-full max-w-[260px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#A88B54] sm:max-w-[380px] lg:max-w-[460px]"
                         >
                             <motion.div
                                 initial={
@@ -884,14 +902,17 @@ export default function HeroSection({
                                               },
                                           }
                                 }
+                                className="w-full"
                             >
                                 <img
                                     src={activeCutoutImage}
                                     alt={theme.cutoutAlt}
+                                    width={640}
+                                    height={580}
                                     loading="eager"
                                     decoding="async"
                                     fetchPriority="high"
-                                    className="mx-auto w-full max-w-[330px] object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.55)] transition-transform duration-500 group-hover:scale-[1.03] sm:max-w-[430px] lg:max-w-[460px]"
+                                    className="mx-auto block h-auto w-full object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.55)] transition-transform duration-500 group-hover:scale-[1.03]"
                                 />
                             </motion.div>
                         </Link>
